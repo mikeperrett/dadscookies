@@ -5,15 +5,9 @@
   "dependencies": {
     "libraries": [
       {
-        "userSymbol": "Instructions",
-        "version": "0",
-        "libraryId": "1kk9DwSGdk9kW0shZrKhXb9qqdCALqxyUXYamsC__sT7N86IH1gHtPKdn",
-        "developmentMode": true
-      },
-      {
         "userSymbol": "DCBase",
-        "version": "0",
         "libraryId": "1wZhleRST_96E_py2e5Bez9ELvh6S20Ak17m7jVF0oFGVuN-L_YtKTodO",
+        "version": "0",
         "developmentMode": true
       }
     ]
