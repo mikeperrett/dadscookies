@@ -63,7 +63,7 @@ function doGet() {
   // });
   // return ContentService.createTextOutput(content);
   // return HtmlService.createHtmlOutput('<h1>Hello There</h1');
-  return ContentService.createTextOutput('Version v5');
+  return ContentService.createTextOutput('Version v7');
 //   return HtmlService.createHtmlOutputFromFile('index');
 }
 
