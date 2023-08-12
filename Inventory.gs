@@ -61,8 +61,8 @@ function processShippingInput(received, formValues, ordinal) {
 }
 
 function updateFrozenInventory(e) {
-  var range = getRange(Sheet.Frozen);
-  var rangeValues = range.getValues();
+  var frozen = new CFrozen();
+  var inventory = frozen.list;
   var formValues = e.namedValues;
   var count = 0;
   var flavor = '';
@@ -75,20 +75,21 @@ function updateFrozenInventory(e) {
   for(var key in formValues) {    
     flavor = key;
     count = formValues[key];
-    for (var index in rangeValues) {
-      if (index && (rangeValues[index][0].indexOf(flavor) == 0) && rangeValues[index][2] == location) {
-        Logger.log('Product: ' + rangeValues[index][0] + ', Flavor: ' + flavor + ', Count: ' + count);
-        rangeValues[index][1] = count;
-      } else if (index && special1 && (rangeValues[index][0].indexOf(special1) == 0) && rangeValues[index][2] == location) {
-        // Logger.log('Product: ' + values[index][0] + ', Flavor: ' + flavor + ', Count: ' + count);
-        rangeValues[index][1] = specialCount1;
-      } else if (index && special2 && (rangeValues[index][0].indexOf(special2) == 0) && rangeValues[index][2] == location) {
-        // Logger.log('Product: ' + values[index][0] + ', Flavor: ' + flavor + ', Count: ' + count);
-        rangeValues[index][1] = specialCount2;
+    inventory.forEach(item => {
+      if (item.name.indexOf(flavor) == 0 && item.location == location) {
+        // Logger.log('Item: ' + item.name + ', Flavor: ' + flavor + ', Count: ' + count + ', Location: ' + item.location);
+        item.count = count;
+        frozen.update(item);
+      } else if (special1 && item.name.indexOf(special1) == 0 && item.location == location) {
+        item.count = specialCount1;
+        frozen.update(item);
+      } else if (special2 && item.name.indexOf(special2) == 0 && item.location == location) {
+        item.count = specialCount2;
+        frozen.update(item);
       }
-    }    
+    });
   }
-  range.setValues(rangeValues);
+  frozen.save();
 }
 
 function sendIngredientsInventory() {

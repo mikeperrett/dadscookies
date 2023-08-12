@@ -54,6 +54,14 @@ const FormId = {
   ShipmentReceivedMobile: '1yVJStpXYfMnCk4xpYNZczBk66hrUiD-wPF8GQAa5wKc'
 }
 
+const Scripts = {
+  Instructions: '1kk9DwSGdk9kW0shZrKhXb9qqdCALqxyUXYamsC__sT7N86IH1gHtPKdn'
+}
+
+function getVersion() {
+  return PropertiesService.getScriptProperties().getProperty('version');
+}
+
 function doGet() {
   // var batches = getBatches();
   // var content = ''
@@ -63,7 +71,7 @@ function doGet() {
   // });
   // return ContentService.createTextOutput(content);
   // return HtmlService.createHtmlOutput('<h1>Hello There</h1');
-  return ContentService.createTextOutput('Version v8');
+  return ContentService.createTextOutput('Version: ' + getVersion());
 //   return HtmlService.createHtmlOutputFromFile('index');
 }
 
