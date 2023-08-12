@@ -2,16 +2,7 @@
   "timeZone": "America/Los_Angeles",
   "exceptionLogging": "STACKDRIVER",
   "runtimeVersion": "V8",
-  "dependencies": {
-    "libraries": [
-      {
-        "userSymbol": "DCBase",
-        "libraryId": "1wZhleRST_96E_py2e5Bez9ELvh6S20Ak17m7jVF0oFGVuN-L_YtKTodO",
-        "version": "0",
-        "developmentMode": true
-      }
-    ]
-  },
+  "dependencies": {},
   "webapp": {
     "executeAs": "USER_DEPLOYING",
     "access": "MYSELF"
