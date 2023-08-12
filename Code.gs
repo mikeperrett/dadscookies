@@ -63,7 +63,8 @@ function doGet() {
   // });
   // return ContentService.createTextOutput(content);
   // return HtmlService.createHtmlOutput('<h1>Hello There</h1');
-  return HtmlService.createHtmlOutputFromFile('index');
+  return ContentService.createTextOutput('Version v8');
+//   return HtmlService.createHtmlOutputFromFile('index');
 }
 
 function getAuthorization() {
@@ -365,13 +366,13 @@ function formSubmitted(e) {
   var sheet = SpreadsheetApp.getActive().getName(); 
   var values = e.values;
   if (updateStock(sheet, values[1])) {
-    var subject = 'Batch Completed for (' + sheet + ')';
     var batch = updateBatch(sheet, e.values[1]);
     if (batch) {
+      var subject = 'Batch Completed for (' + batch.name + ')';
       var emailBody = buildBatchCompletedEmail(e.values, batch);
       sendNotification(subject, emailBody, NotificationType.Batch);
       checkStockAlerts();
-      Instructions.buildDocument();
+      buildInstructionsDoc();
     }
   }
 }
@@ -382,7 +383,7 @@ function buildBatchCompletedEmail(values, batch) {
   emailBody += 'Submitted: ' + date.toLocaleString() + '\n';
   emailBody += 'Location: ' + values[1] + '\n';
   emailBody += 'Employee: ' + values[2] + '\n';
-  emailBody += 'Batch Progress: Completed ' + batch[3] + ' of ' + batch[2] + '\n\n';
+  emailBody += 'Batch Progress: Completed ' + batch.completed + ' of ' + batch.goal + '\n\n';
   var index = 1;
   for (var i = 4; i < values.length; i++) {
     if (values[i]) {
