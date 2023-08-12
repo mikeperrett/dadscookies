@@ -12,7 +12,7 @@ function resetDailyBatchProgress() {
     }
   }
   range.setValues(batches);
-  Instructions.buildDocument();
+  buildInstructionsDoc();
 }
 
 function updateBatch(flavor, location) {

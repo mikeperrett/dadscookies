@@ -63,7 +63,8 @@ function doGet() {
   // });
   // return ContentService.createTextOutput(content);
   // return HtmlService.createHtmlOutput('<h1>Hello There</h1');
-  return HtmlService.createHtmlOutputFromFile('index');
+  return ContentService.createTextOutput('Version v5');
+//   return HtmlService.createHtmlOutputFromFile('index');
 }
 
 function getAuthorization() {
@@ -371,7 +372,7 @@ function formSubmitted(e) {
       var emailBody = buildBatchCompletedEmail(e.values, batch);
       sendNotification(subject, emailBody, NotificationType.Batch);
       checkStockAlerts();
-      Instructions.buildDocument();
+      buildInstructionsDoc();
     }
   }
 }
