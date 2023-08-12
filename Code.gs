@@ -343,8 +343,15 @@ function testSendNotification() {
 }
 
 // type = 'batch' or 'inventory'
-function sendNotification(subject, body, type) {
-  var recipients = getRange(Sheet.Users).getValues();
+function sendNotification(subject, body, type) {  
+  var recipients = new CUsers().list; 
+  recipients.forEach(user => {
+    if (user.email) {
+      if (user.batchNotifications && type == NotificationType.Batch || user.inventoryNotifications && type == NotificationType.Inventory) {
+        MailApp.sendEmail(user.email, subject, body);
+      }
+    }
+  });
   for (index in recipients) {
     if (index > 0 && recipients[index][1]) {
       if ((recipients[index][3] == true && type == NotificationType.Batch) || (recipients[index][4] == true && type == NotificationType.Inventory)) {
