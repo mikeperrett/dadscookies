@@ -1,5 +1,15 @@
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 
+const UnitOfMeasure = {
+  Kilogram: 'kg',
+  Pound: 'lb',
+  Unit: 'u',
+  Ounce: 'oz',
+  Gallon: 'gal',
+  Cup: 'cup',
+  NA: 'n/a',
+}
+
 const NotificationType = {
   Batch: 0,
   Inventory: 1
@@ -70,6 +80,10 @@ function getStock() {
   return new CStock();
 }
 
+function getUoms() {
+  return Object.values(UnitOfMeasure);
+}
+
 function getData() {
   var x = new CBatchRecipes();
   // for(index in x.list) {
@@ -107,7 +121,7 @@ function updateShippingForm() {
   }
   values = getRange(Sheet.Lists).getValues();
   var formValues = form.getItems();
-  var uoms = DCBase.getUoms();
+  var uoms = getUoms();
   setupShippingInputs(formValues, ingredients, uoms, '1st');
   setupShippingInputs(formValues, ingredients, uoms, '2nd');
   setupShippingInputs(formValues, ingredients, uoms, '3rd');
