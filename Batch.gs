@@ -4,34 +4,31 @@ function testUpdateBatch() {
 }
 
 function resetDailyBatchProgress() {
-  var range = getRange(Sheet.Batches);
-  var batches = range.getValues();
-  for (b in batches) {
-    if (b > 0) {
-      batches[b][3] = 0;
-    }
-  }
-  range.setValues(batches);
+  var batches = new CBatches();
+  batches.list.forEach(batch => {
+    batch.completed = 0;
+    batches.update(batch);
+  });
+  batches.save();
   buildInstructionsDoc();
 }
 
 function updateBatch(flavor, location) {
+  const flavors = new CFlavors();
   var batch = {};
-  var flavors = getRange(Sheet.Flavors).getValues();
-  for (f in flavors) {
-    if (f > 0 && flavors[f][4] == flavor) {
-      var batchesRange = getRange(Sheet.Batches);
-      var batches = batchesRange.getValues();
-      for (b in batches) {
-        if (b > 0 && batches[b][0] == flavors[f][0] && location == batches[b][1]) {
-          batches[b][3]++;
-          batch = batches[b];
-          batchesRange.setValues(batches);
-          break;
+  flavors.list.forEach(f => {
+    if (f.formName == flavor) {
+      const batches = new CBatches();
+      batches.list.forEach(b => {
+        if (b.location == location && b.name == f.name) {
+          b.completed++;
+          batch = b;
+          batches.update(b);
+          batches.save();
         }
-      }
-      break;
+      })
     }
-  }
+  });
+  buildInstructionsDoc();
   return batch;
 }

@@ -44,6 +44,7 @@ function updateInventoryFromShipment(location, received) {
     }
   }
   stockRange.setValues(stockValues);
+  buildInstructionsDoc();
   return true;
 }
 
@@ -87,7 +88,6 @@ function updateFrozenInventory(e) {
       }
     }    
   }
-  Logger.log(rangeValues);
   range.setValues(rangeValues);
 }
 
@@ -113,7 +113,7 @@ function sendIngredientsInventory() {
 }
 
 function testUpdateStock() {
-  updateStock('testsheet', 'Fresno');
+  updateStock('ChocolateChip', 'Fresno');
 }
 
 function updateStock(formName, location) {

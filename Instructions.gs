@@ -23,38 +23,31 @@ function buildInstructionsDoc() {
   par.setAttributes(headerStyle);
   par.setLineSpacing(1.5);
 
-  var flavors = getFlavors();
-  for(var index in flavors) {
-    var batch = flavors[index];
-    var name = batch.name;
-    if (batch.enabled) {
-      linkStyle[DocumentApp.Attribute.LINK_URL] = batch.form;
-      par = body.appendParagraph(name);
+  var flavors = new CFlavors();
+  flavors.list.forEach(flavor => {
+    if (flavor.enabled) {
+      linkStyle[DocumentApp.Attribute.LINK_URL] = flavor.form;
+      par = body.appendParagraph(flavor.name);
       par.setAttributes(linkStyle);
       par.setLineSpacing(2);
-    } else {
-      // name += ' (disabled)';
-      // par = body.appendParagraph(name);
-      // par.setLineSpacing(2);
     }
-  }
+  });
 
   par = body.appendParagraph('Daily Batch Progress');
   par.setAttributes(headerStyle);
   par.setLineSpacing(1.5);
 
-  var progress = getBatches().list; // Stock.getRange('Batches').getValues();
+  var progress = new CBatches().list; // Stock.getRange('Batches').getValues();
   var tableData = [];
   tableData.push(['Name', 'Location', 'Completed', 'Goal']);
-  for (b in progress) {
-    for (f in flavors) {
-      if (flavors[f].name == progress[b].name && flavors[f].enabled) {
-        var row = [progress[b].name, progress[b].location, progress[b].completed, progress[b].goal];
+  progress.forEach(p => {
+    flavors.list.forEach(flavor => {
+      if (flavor.name == p.name && flavor.enabled) {
+        const row = [p.name, p.location, p.completed, p.goal];
         tableData.push(row);
-        break;
       }
-    }
-  }
+    })
+  });
   var table = body.appendTable(tableData);
   table.setAttributes(tableStyle);
   table.setColumnWidth(0, 300);
@@ -82,19 +75,19 @@ function buildInstructionsDoc() {
   par.setAttributes(headerStyle);
   par.setLineSpacing(1.5); 
 
-  var stock = getStock().list;
+  var stock = new CStock().list;
   var fresnoStock = [];
   fresnoStock.push(['Ingredient', 'Amount']);
   var lemooreStock = [];
   lemooreStock.push(['Ingredient', 'Amount']);
-  for(s in stock) {
-    var item = [stock[s].name, Utilities.formatString('%01.3f %s', stock[s].amount, stock[s].uom)];
-    if (stock[s].location === 'Fresno') {
+  stock.forEach(s => {
+    var item = [s.name, Utilities.formatString('%01.3f %s', s.amount, s.uom)];
+    if (s.location === 'Fresno') {
       fresnoStock.push(item);
     } else {
       lemooreStock.push(item);
     }
-  }
+  });
   var table = body.appendTable(fresnoStock);
   table.setAttributes(tableStyle);
   table.setColumnWidth(0, 300);
