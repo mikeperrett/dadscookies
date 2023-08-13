@@ -128,7 +128,6 @@ function updateShippingForm() {
       ingredients.push(data[x].name)
     }
   }
-  values = getRange(Sheet.Lists).getValues();
   var formValues = form.getItems();
   var uoms = getUoms();
   setupShippingInputs(formValues, ingredients, uoms, '1st');
@@ -160,19 +159,19 @@ function setupShippingInputs(formValues, ingredients, uoms, ordinal) {
 }
 
 function updateAllForms() {
-  var users = new CUsers(Sheet.Users);
-  updateLocationsAndEmployees(FormId.ClassicChocolateChip, users.list);
-  updateLocationsAndEmployees(FormId.CookiesNCream, users.list);
-  updateLocationsAndEmployees(FormId.CakeBatter, users.list);
-  updateLocationsAndEmployees(FormId.Snickerdoodle, users.list);
-  updateLocationsAndEmployees(FormId.PeanutButterChocolateChip, users.list);
-  updateLocationsAndEmployees(FormId.ChocolatePeanutButterChip, users.list);
-  updateLocationsAndEmployees(FormId.OatmealChocolateChip, users.list);
-  updateLocationsAndEmployees(FormId.OatmealRaisin, users.list);
-  updateLocationsAndEmployees(FormId.CookieCounter, users.list);
-  updateLocationsAndEmployees(FormId.SpecialCookieOne, users.list);
-  updateLocationsAndEmployees(FormId.SpecialCookieTwo, users.list);
-  updateLocationsAndEmployees(FormId.ShipmentReceivedMobile, users.list);
+  var users = new CUsers(Sheet.Users).list;
+  updateLocationsAndEmployees(FormId.ClassicChocolateChip, users);
+  updateLocationsAndEmployees(FormId.CookiesNCream, users);
+  updateLocationsAndEmployees(FormId.CakeBatter, users);
+  updateLocationsAndEmployees(FormId.Snickerdoodle, users);
+  updateLocationsAndEmployees(FormId.PeanutButterChocolateChip, users);
+  updateLocationsAndEmployees(FormId.ChocolatePeanutButterChip, users);
+  updateLocationsAndEmployees(FormId.OatmealChocolateChip, users);
+  updateLocationsAndEmployees(FormId.OatmealRaisin, users);
+  updateLocationsAndEmployees(FormId.CookieCounter, users);
+  updateLocationsAndEmployees(FormId.SpecialCookieOne, users);
+  updateLocationsAndEmployees(FormId.SpecialCookieTwo, users);
+  updateLocationsAndEmployees(FormId.ShipmentReceivedMobile, users);
   
   var recipes = new CBatchRecipes().list;
   var specialFlavors = getSpecials();
@@ -212,15 +211,14 @@ function updateAllForms() {
   }
 }
 
+function testGetSpecials() {
+  getSpecials().forEach(x => {
+    Logger.log(`${x.name}, Form: ${x.formName}, Batch Yield: ${x.yield}`);
+  });
+}
+
 function getSpecials() {
-  var flavors = [];
-  var data = new CFlavors().list;
-  for (d in data) {
-    if (data[d].enabled && data[d].special) {
-      flavors.push(data[d]);
-    }
-  }
-  return flavors;
+  return new CFlavors().list.filter(x => x.enabled && x.special);
 }
 
 function setQuestion(form, questions, title, steps) {
@@ -273,41 +271,45 @@ function updateSpecialCookie(formId, data) {
   setQuestion(form, questions, 'Step 4', data.step4);
 }
 
+function testUpdateCookieCounter() {
+  updateCookieCounter(getSpecials());
+}
+
 function updateCookieCounter(flavors) {
   var form = FormApp.openById(FormId.CookieCounter);
   var formValues = form.getItems();
-  var special1 = formValues.findIndex(x => x.getTitle() == 'Special Cookie One');
-  var special1Count = formValues.findIndex(x => x.getTitle() == 'Special Cookie One Quantity');
-  var special2 = formValues.findIndex(x => x.getTitle() == 'Special Cookie Two');
-  var special2Count = formValues.findIndex(x => x.getTitle() == 'Special Cookie Two Quantity');
+  var special1 = formValues.find(x => x.getTitle() == 'Special Cookie One').asListItem();
+  var special1Count = formValues.find(x => x.getTitle() == 'Special Cookie One Quantity').asTextItem();
+  var special2 = formValues.find(x => x.getTitle() == 'Special Cookie Two').asListItem();
+  var special2Count = formValues.find(x => x.getTitle() == 'Special Cookie Two Quantity').asTextItem();
   if (flavors.length) {
     var choices = [];
     for (x in flavors) {
-      choices.push(formValues[special1].asListItem().createChoice(flavors[x].name));
+      choices.push(special1.createChoice(flavors[x].name));
     } 
-    formValues[special1].asListItem().setRequired(true);
-    formValues[special1Count].asTextItem().setRequired(true);
-    formValues[special1].asListItem().setChoices(choices);
+    special1.setRequired(true);
+    special1Count.setRequired(true);
+    special1.setChoices(choices);
 
-    formValues[special2].asListItem().setRequired(flavors.length > 1);
-    formValues[special2Count].asTextItem().setRequired(flavors.length > 1);
+    special2.setRequired(flavors.length > 1);
+    special2Count.setRequired(flavors.length > 1);
     if (flavors.length > 1) {
-      formValues[special2].asListItem().setChoices(choices);
+      special2.setChoices(choices);
     } else {
-      formValues[special2].asListItem().setChoices([
-        formValues[special2].asListItem().createChoice('None')
+      special2.setChoices([
+        special2.createChoice('None')
       ]);
     }
   } else {
-    formValues[special1].asListItem().setRequired(false);
-    formValues[special1Count].asTextItem().setRequired(false);
-    formValues[special1].asListItem().setChoices([
-      formValues[special1].asListItem().createChoice('None')
+    special1.setRequired(false);
+    special1Count.setRequired(false);
+    special1.setChoices([
+      special1.createChoice('None')
     ]);
-    formValues[special2].asListItem().setRequired(false);
-    formValues[special2Count].asTextItem().setRequired(false);
-    formValues[special2].asListItem().setChoices([
-      formValues[special2].asListItem().createChoice('None')
+    special2.setRequired(false);
+    special2Count.setRequired(false);
+    special2.setChoices([
+      special2.createChoice('None')
     ]);
   }
 }
@@ -406,30 +408,5 @@ function getRange(name) {
   var wb = SpreadsheetApp.openByUrl(STOCK_WB);
   var sheet = wb.getSheetByName(name);
   return sheet.getDataRange();
-}
-
-function getFlavors() {
-  var flavors = [];
-  var wb = SpreadsheetApp.openByUrl(STOCK_WB);
-  var sheet = wb.getSheetByName(Sheet.Flavors);
-  var values = sheet.getDataRange().getValues();
-  var index = 0;
-  for(var value in values) {
-    if (value > 0 && values[value][0]) {
-      flavors.push(new Flavor(value, values[value])); // { 'name': values[value][0], 'url': values[value][1], 'enabled': values[value][2], 'special': values[value][3] });
-    }
-  }
-  return flavors;
-}
-
-function getRecipeFromFormName(formName) {
-  var stockSheet = SpreadsheetApp.openByUrl(STOCK_WB);
-  var range = stockSheet.getSheetByName('Flavors');
-  var values = range.getDataRange().getValues();
-  for (index in values) {
-    if (values[index][4] && values[index][2] && values[index][4] == formName) {
-      return values[index][0];
-    }
-  }
 }
 
