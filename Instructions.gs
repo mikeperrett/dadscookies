@@ -1,5 +1,5 @@
 function buildInstructionsDoc() {
-  var doc = DocumentApp.openById(getDocumentId(Form.Instructions));
+  var doc = DocumentApp.openById(getDrive(DriveName.Instructions));
   var body = doc.getBody();
   body.clear();
 
@@ -9,7 +9,7 @@ function buildInstructionsDoc() {
   var linkStyle = { [DocumentApp.Attribute.BOLD]: true, [DocumentApp.Attribute.FONT_SIZE]: 12 };
   var tableStyle = { [DocumentApp.Attribute.BOLD]: true, [DocumentApp.Attribute.FONT_SIZE]: 10 };
 
-  var par = body.appendParagraph('Dads Cookies');
+  var par = body.appendParagraph((version == '0') ? 'Dads Cookies (Beta Version)' : 'Dads Cookies');
   par.setAttributes(titleStyle);
   par.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
 
@@ -57,17 +57,17 @@ function buildInstructionsDoc() {
   par.setLineSpacing(1.5);
 
   par = body.appendParagraph('Frozen Cookie Count Inventory Form');
-  linkStyle[DocumentApp.Attribute.LINK_URL] = 'https://forms.gle/tpA4pUBriFzwtL719';
+  linkStyle[DocumentApp.Attribute.LINK_URL] = getDrive(DriveName.CookieCounterLink);
   par.setAttributes(linkStyle)
   par.setLineSpacing(2);
 
   par = body.appendParagraph('Shipment Received (Desktop)');
-  linkStyle[DocumentApp.Attribute.LINK_URL] = 'https://docs.google.com/spreadsheets/d/1-x1QNOMd9YnawMjbUbT7sAsTCyV0DQ0rkDhu5J19rAY';
+  linkStyle[DocumentApp.Attribute.LINK_URL] = getDrive(DriveName.ShippingReceivedWb);
   par.setAttributes(linkStyle)
   par.setLineSpacing(2);
 
   par = body.appendParagraph('Shipment Received (mobile)');
-  linkStyle[DocumentApp.Attribute.LINK_URL] = 'https://forms.gle/Kp7H9kHZRzkRgjxa7';
+  linkStyle[DocumentApp.Attribute.LINK_URL] = getDrive(DriveName.ShipmentReceivedMobileLink);
   par.setAttributes(linkStyle)
   par.setLineSpacing(2);
 

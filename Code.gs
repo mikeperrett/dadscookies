@@ -27,7 +27,7 @@ const Sheet = {
   Users: 'Users'
 }
 
-const Form = {
+const DriveName = {
   ClassicChocolateChip: 'ChocolateChip',
   CookiesNCream: 'CookiesNCream',
   CakeBatter: 'BirthdayCakeBatter',
@@ -38,11 +38,13 @@ const Form = {
   OatmealRaisin: 'OatmealRaisin',
   SpecialCookieOne: 'SpecialCookieOne',
   SpecialCookieTwo: 'SpecialCookieTwo',
-  Instructions: 'Instructions'
-}
-
-const Scripts = {
-  Instructions: '1kk9DwSGdk9kW0shZrKhXb9qqdCALqxyUXYamsC__sT7N86IH1gHtPKdn'
+  Instructions: 'Instructions',
+  Stock: 'Stock',
+  CookieCounter: 'CookieCounter',
+  CookieCounterLink: 'CookieCounterLink',
+  ShipmentReceivedMobile: 'ShipmentReceived',
+  ShipmentReceivedMobileLink: 'ShipmentReceivedLink',
+  ShippingReceivedWb: 'ShippingReceivedWb'
 }
 
 function getSpreadsheet() {
@@ -52,48 +54,52 @@ function getSpreadsheet() {
   return STOCK_WB;
 }
 
-function getDocumentId(name) {
+function getDrive(name) {
   if (version == '0') {
     // Dev documents
     switch (name) {
-      case Form.ClassicChocolateChip: return '1Jy7C8YHgSmgqr2nDYRMmSWMs56LCusxj7zjQ7t9_6V0';
-      case Form.CookiesNCream: return '1v4EYH9AbYhfIdgN9XHQ9sWoFIulLGFFo9msM9Fp43WU';
-      case Form.CakeBatter: return '1Lky99RutyC3GLI80kfDUBm9774Fk6FsYNw3Xf49wPi4';
-      case Form.Snickerdoodle: return '1eInWUVBE-7pXEGUX7LCxaRoi--XaUqjsVWFPMHrmHkE';
-      case Form.PeanutButterChocolateChip: return '1SWXIL5oIwjRTGWj3FzkQowigXzMyPPoYn9b_BQizBfQ';
-      case Form.ChocolatePeanutButterChip: return '1n1OwY6q9BDkUb8PrD_qYFiWdZuX-Zpmb7dHeiT2hHeM';
-      case Form.OatmealChocolateChip: return '1-xGA3nAGfg0j8QnryY5yGNuw2mjvCM_2g0aiCAL1yQI';
-      case Form.OatmealRaisin: return '1QYBymJO5PIHf1wRHcv57NqUWotM_i2QpCaQAVSBxZQI';
-      case Form.SpecialCookieOne: return '13EY_FRoaChO6oi6TcLNrXLsjS9u47QWAB_TjvT-TtBU';
-      case Form.SpecialCookieTwo: return '1oxC2x0_ZiqCgaVYzGbtQ-KcQ8KAOzWaM0O8fCxD5K8o';
-      case Form.CookieCounter: return '1LGhaUbGJgqPzrM3IoV9AZXl54YAwYKTtekR1-fuVrrQ';
-      case Form.ShipmentRecievedDesktop: return '1GcBDH5xfgMC3ivkHEA4C-FacedbWwX-V1YKhSTIgdQw';
-      case Form.ShipmentReceivedMobile: return '17H7waNlHMwgNn-fUFY2cy7BdvlgMKz0bRRT3FNX_0KY';
-      case Form.Instructions: return '1cDix6Q9BBhXadZMinHUihUAytfCxrHA58AaPNpUhbQw';
+      case DriveName.ClassicChocolateChip: return '1Jy7C8YHgSmgqr2nDYRMmSWMs56LCusxj7zjQ7t9_6V0';
+      case DriveName.CookiesNCream: return '1v4EYH9AbYhfIdgN9XHQ9sWoFIulLGFFo9msM9Fp43WU';
+      case DriveName.CakeBatter: return '1Lky99RutyC3GLI80kfDUBm9774Fk6FsYNw3Xf49wPi4';
+      case DriveName.Snickerdoodle: return '1eInWUVBE-7pXEGUX7LCxaRoi--XaUqjsVWFPMHrmHkE';
+      case DriveName.PeanutButterChocolateChip: return '1SWXIL5oIwjRTGWj3FzkQowigXzMyPPoYn9b_BQizBfQ';
+      case DriveName.ChocolatePeanutButterChip: return '1n1OwY6q9BDkUb8PrD_qYFiWdZuX-Zpmb7dHeiT2hHeM';
+      case DriveName.OatmealChocolateChip: return '1-xGA3nAGfg0j8QnryY5yGNuw2mjvCM_2g0aiCAL1yQI';
+      case DriveName.OatmealRaisin: return '1QYBymJO5PIHf1wRHcv57NqUWotM_i2QpCaQAVSBxZQI';
+      case DriveName.SpecialCookieOne: return '13EY_FRoaChO6oi6TcLNrXLsjS9u47QWAB_TjvT-TtBU';
+      case DriveName.SpecialCookieTwo: return '1oxC2x0_ZiqCgaVYzGbtQ-KcQ8KAOzWaM0O8fCxD5K8o';
+      case DriveName.CookieCounter: return '1LGhaUbGJgqPzrM3IoV9AZXl54YAwYKTtekR1-fuVrrQ';
+      case DriveName.CookieCounterLink: return 'https://forms.gle/2RAEmXgGGCetBcYj9';
+      case DriveName.ShipmentRecievedDesktop: return '1GcBDH5xfgMC3ivkHEA4C-FacedbWwX-V1YKhSTIgdQw';
+      case DriveName.ShipmentReceivedMobile: return '17H7waNlHMwgNn-fUFY2cy7BdvlgMKz0bRRT3FNX_0KY';
+      case DriveName.ShipmentReceivedMobileLink: return 'https://forms.gle/MAJiN8RyqjV633EbA';
+      case DriveName.Instructions: return '1cDix6Q9BBhXadZMinHUihUAytfCxrHA58AaPNpUhbQw';
+      case DriveName.ShippingReceivedWb: return 'https://docs.google.com/spreadsheets/d/1GcBDH5xfgMC3ivkHEA4C-FacedbWwX-V1YKhSTIgdQw';
+      case DriveName.Stock: return STOCK_WB_DEV;
     }
   } else {
     // Production documents
     switch (name) {
-      case Form.ClassicChocolateChip: return '1L8OT7CsMQNwNc-8ZU2VohK0P7o02xleb7sfJ70qRfv8';
-      case Form.CookiesNCream: return '1y1joj74-G4VN5b24yIONNi_U2Bt2g1RKT5vWx_aDcgI';
-      case Form.CakeBatter: return '1dZt56rIYQi1JsYpeKq7mKMJ0N871-DRBcSSI2HNnaGo';
-      case Form.Snickerdoodle: return '1HIObZDu84OzgZikAUnjygnuuPBL-3xrzlgBGoVlMi_c';
-      case Form.PeanutButterChocolateChip: return '1IAqe6nn3Fzpz5L6P6BJ7naK6MxQ4g9FBlsqM3TEJNWg';
-      case Form.ChocolatePeanutButterChip: return '1ptuRAXSorQMdL_AX9QTyd14fc7gQ_8XcwsQK3di_yNc';
-      case Form.OatmealChocolateChip: return '1UxWoHprHywy9kg1t7_rbk_K23Ge2K8ZDQ3tvvYhvONU';
-      case Form.OatmealRaisin: return '1qiss8IZCtYBA-FWUcYFYgYgUK3c-pfsdt81QLUsjg2U';
-      case Form.SpecialCookieOne: return '1iUJezM6gziCGkDSzcO4HPsWvMVbcyy9nQBH7TFcM2IA';
-      case Form.SpecialCookieTwo: return '1WK8NEaiLbEOTDDUwPWKrjxhIY6ocUjKXSuqgjqAl38A';
-      case Form.CookieCounter: return '1ImDLQuuR5BdacaLSedMpF4uLvrOMwpq7he1mXVnb7c8';
-      case Form.ShipmentRecievedDesktop: return '1-x1QNOMd9YnawMjbUbT7sAsTCyV0DQ0rkDhu5J19rAY';
-      case Form.ShipmentReceivedMobile: return '1yVJStpXYfMnCk4xpYNZczBk66hrUiD-wPF8GQAa5wKc';
-      case Form.Instructions: return '1g9ogRragAO1qg4WghPGyZS-9Xm9ROYU0zqSpYRbFCs4';
+      case DriveName.ClassicChocolateChip: return '1L8OT7CsMQNwNc-8ZU2VohK0P7o02xleb7sfJ70qRfv8';
+      case DriveName.CookiesNCream: return '1y1joj74-G4VN5b24yIONNi_U2Bt2g1RKT5vWx_aDcgI';
+      case DriveName.CakeBatter: return '1dZt56rIYQi1JsYpeKq7mKMJ0N871-DRBcSSI2HNnaGo';
+      case DriveName.Snickerdoodle: return '1HIObZDu84OzgZikAUnjygnuuPBL-3xrzlgBGoVlMi_c';
+      case DriveName.PeanutButterChocolateChip: return '1IAqe6nn3Fzpz5L6P6BJ7naK6MxQ4g9FBlsqM3TEJNWg';
+      case DriveName.ChocolatePeanutButterChip: return '1ptuRAXSorQMdL_AX9QTyd14fc7gQ_8XcwsQK3di_yNc';
+      case DriveName.OatmealChocolateChip: return '1UxWoHprHywy9kg1t7_rbk_K23Ge2K8ZDQ3tvvYhvONU';
+      case DriveName.OatmealRaisin: return '1qiss8IZCtYBA-FWUcYFYgYgUK3c-pfsdt81QLUsjg2U';
+      case DriveName.SpecialCookieOne: return '1iUJezM6gziCGkDSzcO4HPsWvMVbcyy9nQBH7TFcM2IA';
+      case DriveName.SpecialCookieTwo: return '1WK8NEaiLbEOTDDUwPWKrjxhIY6ocUjKXSuqgjqAl38A';
+      case DriveName.CookieCounter: return '1ImDLQuuR5BdacaLSedMpF4uLvrOMwpq7he1mXVnb7c8';
+      case DriveName.CookieCounterLink: return 'https://forms.gle/euDXKCU7niYmb1ct9';
+      case DriveName.ShipmentRecievedDesktop: return '1-x1QNOMd9YnawMjbUbT7sAsTCyV0DQ0rkDhu5J19rAY';
+      case DriveName.ShipmentReceivedMobile: return '1yVJStpXYfMnCk4xpYNZczBk66hrUiD-wPF8GQAa5wKc';
+      case DriveName.ShipmentReceivedMobileLink: return 'https://forms.gle/mnT5KE2xCNMkDGcv5';
+      case DriveName.Instructions: return '1g9ogRragAO1qg4WghPGyZS-9Xm9ROYU0zqSpYRbFCs4';
+      case DriveName.ShippingReceivedWb: return 'https://docs.google.com/spreadsheets/d/1-x1QNOMd9YnawMjbUbT7sAsTCyV0DQ0rkDhu5J19rAY';
+      case DriveName.Stock: return STOCK_WB;
     }
   }
-}
-
-function getVersion() {
-  return PropertiesService.getScriptProperties().getProperty('version');
 }
 
 function doGet() {
@@ -148,7 +154,7 @@ function getData() {
 }
 
 function updateShippingForm() {
-  const form = FormApp.openById(getDocumentId(Form.ShipmentReceivedMobile));
+  const form = FormApp.openById(getDrive(DriveName.ShipmentReceivedMobile));
   var data = new CStock().list;
   var ingredients = [];
   for (x in data) {
@@ -188,18 +194,25 @@ function setupShippingInputs(formValues, ingredients, uoms, ordinal) {
 
 function updateAllForms() {
   var users = (new CUsers(Sheet.Users).list).sort((x, y) => x - y );
-  updateLocationsAndEmployees(getDocumentId(Form.ClassicChocolateChip), users);
-  updateLocationsAndEmployees(getDocumentId(Form.CookiesNCream), users);
-  updateLocationsAndEmployees(getDocumentId(Form.CakeBatter), users);
-  updateLocationsAndEmployees(getDocumentId(Form.Snickerdoodle), users);
-  updateLocationsAndEmployees(getDocumentId(Form.PeanutButterChocolateChip), users);
-  updateLocationsAndEmployees(getDocumentId(Form.ChocolatePeanutButterChip), users);
-  updateLocationsAndEmployees(getDocumentId(Form.OatmealChocolateChip), users);
-  updateLocationsAndEmployees(getDocumentId(Form.OatmealRaisin), users);
-  updateLocationsAndEmployees(getDocumentId(Form.CookieCounter), users);
-  updateLocationsAndEmployees(getDocumentId(Form.SpecialCookieOne), users);
-  updateLocationsAndEmployees(getDocumentId(Form.SpecialCookieTwo), users);
-  updateLocationsAndEmployees(getDocumentId(Form.ShipmentReceivedMobile), users);
+  var lists = getRange(Sheet.Lists).getValues();
+  var locations = [];
+  lists.forEach(l => {
+    if (l[0]) {
+      locations.push(l[0]);
+    }
+  });
+  updateLocationsAndEmployees(getDrive(DriveName.ClassicChocolateChip), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.CookiesNCream), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.CakeBatter), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.Snickerdoodle), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.PeanutButterChocolateChip), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.ChocolatePeanutButterChip), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.OatmealChocolateChip), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.OatmealRaisin), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.CookieCounter), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.SpecialCookieOne), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.SpecialCookieTwo), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.ShipmentReceivedMobile), users, locations);
   
   var recipes = new CBatchRecipes().list;
   var specialFlavors = getSpecials();
@@ -230,10 +243,10 @@ function updateAllForms() {
         }      
       }
       var data = { 'title': flavor.name, 'step1': step1, 'step2': step2, 'step3': step3, 'step4': step4 };
-      if (flavor.formName == Form.SpecialCookieOne) {
-        updateSpecialCookie(getDocumentId(Form.SpecialCookieOne), data);
-      } else if (flavor.formName == Form.SpecialCookieTwo) {
-        updateSpecialCookie(getDocumentId(Form.SpecialCookieTwo), data);
+      if (flavor.formName == DriveName.SpecialCookieOne) {
+        updateSpecialCookie(getDrive(DriveName.SpecialCookieOne), data);
+      } else if (flavor.formName == DriveName.SpecialCookieTwo) {
+        updateSpecialCookie(getDrive(DriveName.SpecialCookieTwo), data);
       }
     }
   }
@@ -304,7 +317,7 @@ function testUpdateCookieCounter() {
 }
 
 function updateCookieCounter(flavors) {
-  var form = FormApp.openById(getDocumentId(Form.CookieCounter));
+  var form = FormApp.openById(getDrive(DriveName.CookieCounter));
   var formValues = form.getItems();
   var special1 = formValues.find(x => x.getTitle() == 'Special Cookie One').asListItem();
   var special1Count = formValues.find(x => x.getTitle() == 'Special Cookie One Quantity').asTextItem();
@@ -343,25 +356,20 @@ function updateCookieCounter(flavors) {
 }
 
 // Update locations and employees list in all forms
-function updateLocationsAndEmployees(formId, users) {
+function updateLocationsAndEmployees(formId, users, locations) {
   var form = FormApp.openById(formId);
   // Update some formValues from the ss
   var questions = form.getItems();
-  var lists = getRange(Sheet.Lists).getValues();
 
   // Iterate the questions
   for (var index in questions) {
     switch(index) {
       case '0': // Location
         var question = questions[index].asListItem();
-        var locations  = [];
-        for (var value in lists) {
-          if (lists[value][0]) {
-            locations.push(question.createChoice(lists[value][0]));
-          }
-        }
+        var options = [];
+        locations.forEach(l => options.push(question.createChoice(l)));
         question.setTitle('Where are you working today?')
-          .setChoices(locations)
+          .setChoices(options)
         break;
       case '1': // Employees  
         var question = questions[index].asListItem();
@@ -384,6 +392,10 @@ function testSendNotification() {
 // type = 'batch' or 'inventory'
 function sendNotification(subject, body, type) {  
   var recipients = new CUsers().list; 
+  // If this is dev version; append -DEV to the subject
+  if (version == '0') {
+    subject += ' (Beta Version)'
+  }
   recipients.forEach(user => {
     if (user.email) {
       if (user.batchNotifications && type == NotificationType.Batch || user.inventoryNotifications && type == NotificationType.Inventory) {
