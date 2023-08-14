@@ -1,12 +1,12 @@
 function testStockUpdates() {
-  testStockUpdate('Fresno', Form.ClassicChocolateChip);
-  testStockUpdate('Fresno', Form.CookiesNCream);
-  testStockUpdate('Fresno', Form.CakeBatter);
-  testStockUpdate('Fresno', Form.Snickerdoodle);
-  testStockUpdate('Fresno', Form.PeanutButterChocolateChip);
-  testStockUpdate('Fresno', Form.ChocolatePeanutButterChip);
-  testStockUpdate('Fresno', Form.OatmealChocolateChip);
-  testStockUpdate('Fresno', Form.OatmealRaisin);
+  testStockUpdate('Fresno', DriveName.ClassicChocolateChip);
+  testStockUpdate('Fresno', DriveName.CookiesNCream);
+  testStockUpdate('Fresno', DriveName.CakeBatter);
+  testStockUpdate('Fresno', DriveName.Snickerdoodle);
+  testStockUpdate('Fresno', DriveName.PeanutButterChocolateChip);
+  testStockUpdate('Fresno', DriveName.ChocolatePeanutButterChip);
+  testStockUpdate('Fresno', DriveName.OatmealChocolateChip);
+  testStockUpdate('Fresno', DriveName.OatmealRaisin);
 }
 
 function testStockUpdate(location, form) {
