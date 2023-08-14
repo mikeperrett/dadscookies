@@ -23,8 +23,8 @@ function buildInstructionsDoc() {
   par.setAttributes(headerStyle);
   par.setLineSpacing(1.5);
 
-  var flavors = new CFlavors();
-  flavors.list.forEach(flavor => {
+  const flavors = new CFlavors().list;
+  flavors.forEach(flavor => {
     if (flavor.enabled) {
       linkStyle[DocumentApp.Attribute.LINK_URL] = flavor.form;
       par = body.appendParagraph(flavor.name);
@@ -41,7 +41,7 @@ function buildInstructionsDoc() {
   var tableData = [];
   tableData.push(['Name', 'Location', 'Completed', 'Goal']);
   progress.forEach(p => {
-    flavors.list.forEach(flavor => {
+    flavors.forEach(flavor => {
       if (flavor.name == p.name && flavor.enabled) {
         const row = [p.name, p.location, p.completed, p.goal];
         tableData.push(row);
@@ -71,7 +71,7 @@ function buildInstructionsDoc() {
   par.setAttributes(linkStyle)
   par.setLineSpacing(2);
 
-  var stock = new CStock().list;
+  const stock = new CStock().list;
   const locations = getLocations();
   locations.forEach(l => {
     var location = {'location': l, 'data': []};
@@ -97,8 +97,12 @@ function buildInstructionsDoc() {
     location.data.push(['Flavor', 'Count']);
     frozen.forEach(f => {
       if (l == f.location) {
-        var item = [f.name, Utilities.formatString('%d', f.count)];
-        location.data.push(item);
+        // Is the flavor enabled?
+        const flavor = flavors.find(x => x.enabled && x.name == f.name);
+        if (flavor) {
+          var item = [f.name, Utilities.formatString('%d', f.count)];
+          location.data.push(item);
+        }
       }
     });
     par = body.appendParagraph(`Frozen Inventory (${l})`);
