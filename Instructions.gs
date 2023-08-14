@@ -71,32 +71,42 @@ function buildInstructionsDoc() {
   par.setAttributes(linkStyle)
   par.setLineSpacing(2);
 
-  par = body.appendParagraph('Raw Ingredients Inventory (Fresno)');
-  par.setAttributes(headerStyle);
-  par.setLineSpacing(1.5); 
-
   var stock = new CStock().list;
-  var fresnoStock = [];
-  fresnoStock.push(['Ingredient', 'Amount']);
-  var lemooreStock = [];
-  lemooreStock.push(['Ingredient', 'Amount']);
-  stock.forEach(s => {
-    var item = [s.name, Utilities.formatString('%01.3f %s', s.amount, s.uom)];
-    if (s.location === 'Fresno') {
-      fresnoStock.push(item);
-    } else {
-      lemooreStock.push(item);
-    }
-  });
-  var table = body.appendTable(fresnoStock);
-  table.setAttributes(tableStyle);
-  table.setColumnWidth(0, 300);
+  const locations = getLocations();
+  locations.forEach(l => {
+    var location = {'location': l, 'data': []};
+    location.data.push(['Ingredient', 'Amount']);
+    stock.forEach(s => {
+      if (l == s.location) {
+        var item = [s.name, Utilities.formatString('%01.3f %s', s.amount, s.uom)];
+        location.data.push(item);
+      }
+    });
+    par = body.appendParagraph(`Raw Ingredients Inventory (${l})`);
+    par.setAttributes(headerStyle);
+    par.setLineSpacing(1.5); 
 
-  par = body.appendParagraph('Raw Ingredients Inventory (Lemoore)');
-  par.setAttributes(headerStyle);
-  par.setLineSpacing(1.5); 
-  
-  table = body.appendTable(lemooreStock);
-  table.setAttributes(tableStyle);
-  table.setColumnWidth(0, 300);
+    const table = body.appendTable(location.data);
+    table.setAttributes(tableStyle);
+    table.setColumnWidth(0, 300);
+  });
+
+  const frozen = new CFrozen().list;
+  locations.forEach(l => {
+    var location = {'location': l, 'data': []};
+    location.data.push(['Flavor', 'Count']);
+    frozen.forEach(f => {
+      if (l == f.location) {
+        var item = [f.name, Utilities.formatString('%d', f.count)];
+        location.data.push(item);
+      }
+    });
+    par = body.appendParagraph(`Frozen Inventory (${l})`);
+    par.setAttributes(headerStyle);
+    par.setLineSpacing(1.5); 
+
+    const table = body.appendTable(location.data);
+    table.setAttributes(tableStyle);
+    table.setColumnWidth(0, 300);
+  });
 }

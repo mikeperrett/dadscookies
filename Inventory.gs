@@ -90,6 +90,7 @@ function updateFrozenInventory(e) {
     });
   }
   frozen.save();
+  buildInstructionsDoc();
 }
 
 function sendIngredientsInventory() {

@@ -127,6 +127,17 @@ function getUoms() {
   return Object.values(UnitOfMeasure);
 }
 
+function getLocations() {
+  var lists = getRange(Sheet.Lists).getValues();
+  var locations = [];
+  lists.forEach(l => {
+    if (l[0]) {
+      locations.push(l[0]);
+    }
+  });
+  return locations;
+}
+
 function getData() {
   var x = new CBatchRecipes();
   // for(index in x.list) {
@@ -194,13 +205,7 @@ function setupShippingInputs(formValues, ingredients, uoms, ordinal) {
 
 function updateAllForms() {
   var users = (new CUsers(Sheet.Users).list).sort((x, y) => x - y );
-  var lists = getRange(Sheet.Lists).getValues();
-  var locations = [];
-  lists.forEach(l => {
-    if (l[0]) {
-      locations.push(l[0]);
-    }
-  });
+  const locations = getLocations();
   updateLocationsAndEmployees(getDrive(DriveName.ClassicChocolateChip), users, locations);
   updateLocationsAndEmployees(getDrive(DriveName.CookiesNCream), users, locations);
   updateLocationsAndEmployees(getDrive(DriveName.CakeBatter), users, locations);
