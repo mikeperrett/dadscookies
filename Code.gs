@@ -1,4 +1,6 @@
+const version = PropertiesService.getScriptProperties().getProperty('version');
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
+const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
 
 const UnitOfMeasure = {
   Kilogram: 'kg',
@@ -35,27 +37,59 @@ const Form = {
   OatmealChocolateChip: 'OatmealChocolateChip',
   OatmealRaisin: 'OatmealRaisin',
   SpecialCookieOne: 'SpecialCookieOne',
-  SpecialCookieTwo: 'SpecialCookieTwo'
-}
-
-const FormId = {
-  ClassicChocolateChip: '1L8OT7CsMQNwNc-8ZU2VohK0P7o02xleb7sfJ70qRfv8',
-  CookiesNCream: '1y1joj74-G4VN5b24yIONNi_U2Bt2g1RKT5vWx_aDcgI',
-  CakeBatter: '1dZt56rIYQi1JsYpeKq7mKMJ0N871-DRBcSSI2HNnaGo',
-  Snickerdoodle: '1HIObZDu84OzgZikAUnjygnuuPBL-3xrzlgBGoVlMi_c',
-  PeanutButterChocolateChip: '1IAqe6nn3Fzpz5L6P6BJ7naK6MxQ4g9FBlsqM3TEJNWg',
-  ChocolatePeanutButterChip: '1ptuRAXSorQMdL_AX9QTyd14fc7gQ_8XcwsQK3di_yNc',
-  OatmealChocolateChip: '1UxWoHprHywy9kg1t7_rbk_K23Ge2K8ZDQ3tvvYhvONU',
-  OatmealRaisin: '1qiss8IZCtYBA-FWUcYFYgYgUK3c-pfsdt81QLUsjg2U',
-  SpecialCookieOne: '1iUJezM6gziCGkDSzcO4HPsWvMVbcyy9nQBH7TFcM2IA',
-  SpecialCookieTwo: '1WK8NEaiLbEOTDDUwPWKrjxhIY6ocUjKXSuqgjqAl38A',
-  CookieCounter: '1ImDLQuuR5BdacaLSedMpF4uLvrOMwpq7he1mXVnb7c8',
-  ShipmentRecievedDesktop: '1-x1QNOMd9YnawMjbUbT7sAsTCyV0DQ0rkDhu5J19rAY',
-  ShipmentReceivedMobile: '1yVJStpXYfMnCk4xpYNZczBk66hrUiD-wPF8GQAa5wKc'
+  SpecialCookieTwo: 'SpecialCookieTwo',
+  Instructions: 'Instructions'
 }
 
 const Scripts = {
   Instructions: '1kk9DwSGdk9kW0shZrKhXb9qqdCALqxyUXYamsC__sT7N86IH1gHtPKdn'
+}
+
+function getSpreadsheet() {
+  if (version == '0') {
+    return STOCK_WB_DEV;
+  }
+  return STOCK_WB;
+}
+
+function getDocumentId(name) {
+  if (version == '0') {
+    // Dev documents
+    switch (name) {
+      case Form.ClassicChocolateChip: return '1Jy7C8YHgSmgqr2nDYRMmSWMs56LCusxj7zjQ7t9_6V0';
+      case Form.CookiesNCream: return '1v4EYH9AbYhfIdgN9XHQ9sWoFIulLGFFo9msM9Fp43WU';
+      case Form.CakeBatter: return '1Lky99RutyC3GLI80kfDUBm9774Fk6FsYNw3Xf49wPi4';
+      case Form.Snickerdoodle: return '1eInWUVBE-7pXEGUX7LCxaRoi--XaUqjsVWFPMHrmHkE';
+      case Form.PeanutButterChocolateChip: return '1SWXIL5oIwjRTGWj3FzkQowigXzMyPPoYn9b_BQizBfQ';
+      case Form.ChocolatePeanutButterChip: return '1n1OwY6q9BDkUb8PrD_qYFiWdZuX-Zpmb7dHeiT2hHeM';
+      case Form.OatmealChocolateChip: return '1-xGA3nAGfg0j8QnryY5yGNuw2mjvCM_2g0aiCAL1yQI';
+      case Form.OatmealRaisin: return '1QYBymJO5PIHf1wRHcv57NqUWotM_i2QpCaQAVSBxZQI';
+      case Form.SpecialCookieOne: return '13EY_FRoaChO6oi6TcLNrXLsjS9u47QWAB_TjvT-TtBU';
+      case Form.SpecialCookieTwo: return '1oxC2x0_ZiqCgaVYzGbtQ-KcQ8KAOzWaM0O8fCxD5K8o';
+      case Form.CookieCounter: return '1LGhaUbGJgqPzrM3IoV9AZXl54YAwYKTtekR1-fuVrrQ';
+      case Form.ShipmentRecievedDesktop: return '1GcBDH5xfgMC3ivkHEA4C-FacedbWwX-V1YKhSTIgdQw';
+      case Form.ShipmentReceivedMobile: return '17H7waNlHMwgNn-fUFY2cy7BdvlgMKz0bRRT3FNX_0KY';
+      case Form.Instructions: return '1cDix6Q9BBhXadZMinHUihUAytfCxrHA58AaPNpUhbQw';
+    }
+  } else {
+    // Production documents
+    switch (name) {
+      case Form.ClassicChocolateChip: return '1L8OT7CsMQNwNc-8ZU2VohK0P7o02xleb7sfJ70qRfv8';
+      case Form.CookiesNCream: return '1y1joj74-G4VN5b24yIONNi_U2Bt2g1RKT5vWx_aDcgI';
+      case Form.CakeBatter: return '1dZt56rIYQi1JsYpeKq7mKMJ0N871-DRBcSSI2HNnaGo';
+      case Form.Snickerdoodle: return '1HIObZDu84OzgZikAUnjygnuuPBL-3xrzlgBGoVlMi_c';
+      case Form.PeanutButterChocolateChip: return '1IAqe6nn3Fzpz5L6P6BJ7naK6MxQ4g9FBlsqM3TEJNWg';
+      case Form.ChocolatePeanutButterChip: return '1ptuRAXSorQMdL_AX9QTyd14fc7gQ_8XcwsQK3di_yNc';
+      case Form.OatmealChocolateChip: return '1UxWoHprHywy9kg1t7_rbk_K23Ge2K8ZDQ3tvvYhvONU';
+      case Form.OatmealRaisin: return '1qiss8IZCtYBA-FWUcYFYgYgUK3c-pfsdt81QLUsjg2U';
+      case Form.SpecialCookieOne: return '1iUJezM6gziCGkDSzcO4HPsWvMVbcyy9nQBH7TFcM2IA';
+      case Form.SpecialCookieTwo: return '1WK8NEaiLbEOTDDUwPWKrjxhIY6ocUjKXSuqgjqAl38A';
+      case Form.CookieCounter: return '1ImDLQuuR5BdacaLSedMpF4uLvrOMwpq7he1mXVnb7c8';
+      case Form.ShipmentRecievedDesktop: return '1-x1QNOMd9YnawMjbUbT7sAsTCyV0DQ0rkDhu5J19rAY';
+      case Form.ShipmentReceivedMobile: return '1yVJStpXYfMnCk4xpYNZczBk66hrUiD-wPF8GQAa5wKc';
+      case Form.Instructions: return '1g9ogRragAO1qg4WghPGyZS-9Xm9ROYU0zqSpYRbFCs4';
+    }
+  }
 }
 
 function getVersion() {
@@ -71,14 +105,8 @@ function doGet() {
   // });
   // return ContentService.createTextOutput(content);
   // return HtmlService.createHtmlOutput('<h1>Hello There</h1');
-  return ContentService.createTextOutput('Version: ' + getVersion());
+  return ContentService.createTextOutput('Version: ' + version);
 //   return HtmlService.createHtmlOutputFromFile('index');
-}
-
-function getAuthorization() {
-  var authInfo = ScriptApp.getAuthorizationInfo(ScriptApp.AuthMode.FULL);
-  Logger.log(authInfo.getAuthorizationStatus());
-  return authInfo;
 }
 
 function getBatches() {
@@ -120,7 +148,7 @@ function getData() {
 }
 
 function updateShippingForm() {
-  const form = FormApp.openById(FormId.ShipmentReceivedMobile);
+  const form = FormApp.openById(getDocumentId(Form.ShipmentReceivedMobile));
   var data = new CStock().list;
   var ingredients = [];
   for (x in data) {
@@ -159,19 +187,19 @@ function setupShippingInputs(formValues, ingredients, uoms, ordinal) {
 }
 
 function updateAllForms() {
-  var users = new CUsers(Sheet.Users).list;
-  updateLocationsAndEmployees(FormId.ClassicChocolateChip, users);
-  updateLocationsAndEmployees(FormId.CookiesNCream, users);
-  updateLocationsAndEmployees(FormId.CakeBatter, users);
-  updateLocationsAndEmployees(FormId.Snickerdoodle, users);
-  updateLocationsAndEmployees(FormId.PeanutButterChocolateChip, users);
-  updateLocationsAndEmployees(FormId.ChocolatePeanutButterChip, users);
-  updateLocationsAndEmployees(FormId.OatmealChocolateChip, users);
-  updateLocationsAndEmployees(FormId.OatmealRaisin, users);
-  updateLocationsAndEmployees(FormId.CookieCounter, users);
-  updateLocationsAndEmployees(FormId.SpecialCookieOne, users);
-  updateLocationsAndEmployees(FormId.SpecialCookieTwo, users);
-  updateLocationsAndEmployees(FormId.ShipmentReceivedMobile, users);
+  var users = (new CUsers(Sheet.Users).list).sort((x, y) => x - y );
+  updateLocationsAndEmployees(getDocumentId(Form.ClassicChocolateChip), users);
+  updateLocationsAndEmployees(getDocumentId(Form.CookiesNCream), users);
+  updateLocationsAndEmployees(getDocumentId(Form.CakeBatter), users);
+  updateLocationsAndEmployees(getDocumentId(Form.Snickerdoodle), users);
+  updateLocationsAndEmployees(getDocumentId(Form.PeanutButterChocolateChip), users);
+  updateLocationsAndEmployees(getDocumentId(Form.ChocolatePeanutButterChip), users);
+  updateLocationsAndEmployees(getDocumentId(Form.OatmealChocolateChip), users);
+  updateLocationsAndEmployees(getDocumentId(Form.OatmealRaisin), users);
+  updateLocationsAndEmployees(getDocumentId(Form.CookieCounter), users);
+  updateLocationsAndEmployees(getDocumentId(Form.SpecialCookieOne), users);
+  updateLocationsAndEmployees(getDocumentId(Form.SpecialCookieTwo), users);
+  updateLocationsAndEmployees(getDocumentId(Form.ShipmentReceivedMobile), users);
   
   var recipes = new CBatchRecipes().list;
   var specialFlavors = getSpecials();
@@ -203,9 +231,9 @@ function updateAllForms() {
       }
       var data = { 'title': flavor.name, 'step1': step1, 'step2': step2, 'step3': step3, 'step4': step4 };
       if (flavor.formName == Form.SpecialCookieOne) {
-        updateSpecialCookie(FormId.SpecialCookieOne, data);
+        updateSpecialCookie(getDocumentId(Form.SpecialCookieOne), data);
       } else if (flavor.formName == Form.SpecialCookieTwo) {
-        updateSpecialCookie(FormId.SpecialCookieTwo, data);
+        updateSpecialCookie(getDocumentId(Form.SpecialCookieTwo), data);
       }
     }
   }
@@ -276,7 +304,7 @@ function testUpdateCookieCounter() {
 }
 
 function updateCookieCounter(flavors) {
-  var form = FormApp.openById(FormId.CookieCounter);
+  var form = FormApp.openById(getDocumentId(Form.CookieCounter));
   var formValues = form.getItems();
   var special1 = formValues.find(x => x.getTitle() == 'Special Cookie One').asListItem();
   var special1Count = formValues.find(x => x.getTitle() == 'Special Cookie One Quantity').asTextItem();
@@ -404,8 +432,12 @@ function buildBatchCompletedEmail(values, batch) {
   return emailBody;
 }
 
+function testGetRange() {
+  const users = new CUsers().list.forEach(u => { Logger.log(u.name)});
+}
+
 function getRange(name) {
-  var wb = SpreadsheetApp.openByUrl(STOCK_WB);
+  var wb = SpreadsheetApp.openByUrl(getSpreadsheet());
   var sheet = wb.getSheetByName(name);
   return sheet.getDataRange();
 }

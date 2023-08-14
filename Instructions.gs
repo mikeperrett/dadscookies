@@ -1,5 +1,5 @@
 function buildInstructionsDoc() {
-  var doc = DocumentApp.openById('1g9ogRragAO1qg4WghPGyZS-9Xm9ROYU0zqSpYRbFCs4');
+  var doc = DocumentApp.openById(getDocumentId(Form.Instructions));
   var body = doc.getBody();
   body.clear();
 

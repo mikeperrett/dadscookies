@@ -118,7 +118,7 @@ function testUpdateStock() {
 }
 
 function updateStock(formName, location) {
-  Logger.log('Updating stock for ' + formName);
+  Logger.log(`Updating stock for ${formName} at ${location} location`);
   var stock = new CStock();
   var flavors = new CFlavors();
   var flavor = flavors.list.find(x => x.formName == formName);
