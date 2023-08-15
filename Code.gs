@@ -1,4 +1,4 @@
-const version = PropertiesService.getScriptProperties().getProperty('version');
+const version = 13;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
 
@@ -48,14 +48,14 @@ const DriveName = {
 }
 
 function getSpreadsheet() {
-  if (version == '0') {
+  if (version == 0) {
     return STOCK_WB_DEV;
   }
   return STOCK_WB;
 }
 
 function getDrive(name) {
-  if (version == '0') {
+  if (version == 0) {
     // Dev documents
     switch (name) {
       case DriveName.ClassicChocolateChip: return '1Jy7C8YHgSmgqr2nDYRMmSWMs56LCusxj7zjQ7t9_6V0';
@@ -399,7 +399,7 @@ function testSendNotification() {
 function sendNotification(subject, body, type) {  
   var recipients = new CUsers().list; 
   // If this is dev version; append -DEV to the subject
-  if (version == '0') {
+  if (version == 0) {
     subject += ' (Beta Version)'
   }
   recipients.forEach(user => {
