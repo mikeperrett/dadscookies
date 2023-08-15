@@ -1,3 +1,30 @@
+function updateInventoryFromShippingSpreadsheet(ss) {
+  var sheet = ss.getSheetByName('Shipment');
+  var range = sheet.getDataRange();
+  var values = range.getValues();
+  var location = values[1][3];
+  var employee = values[1][4];
+  var confirm = Browser.msgBox(
+    `Are you sure that you want to add these items to your inventory for the ${location} location?`, 
+    Browser.Buttons.YES_NO);
+  if (confirm != 'yes') {
+    return false;
+  }
+  var shipment = [];
+  for (index in values) {
+    var item = values[index];
+    if (index > 0 && item[1]) {
+      shipment.push([item[0], item[1], item[2], location]);
+      values[index][1] = null;
+    }
+  }
+  if (shipment.length) {
+    if (updateInventoryFromShipment(location, shipment)) {
+      sendInventoryReceivedEmail(location, shipment, employee);
+      range.setValues(values);
+    }
+  }
+}
 
 function onReceivedShipment(e) {
   var formValues = e.namedValues;
@@ -22,7 +49,7 @@ function sendInventoryReceivedEmail(location, received, employee) {
   body += 'Employee: ' + employee + '\n';
   body += 'Items Received: \n';
   for (item in received) {
-    body += Utilities.formatString('%d %s "%s"\n', received[item].amount, received[item].uom, received[item].ingredient);
+    body += Utilities.formatString('%d %s "%s"\n', received[item][1], received[item][2], received[item][0]);
   }
   sendNotification(subject, body, NotificationType.Inventory);
 }
@@ -39,8 +66,10 @@ function updateInventoryFromShipment(location, received) {
   Logger.log('Updating inventory for ' + location);
   const stock = new CStock();
   received.forEach(r => {
-    const item = stock.list.find(x => x.name == r.ingredient && x.location == location);
+    const item = stock.list.find(x => x.name == r[0] && x.location == location);
     if (item) {
+      Logger.log(`Updating item: ${item.name}`);
+      item.amount += convertUom(r[2], item.uom, r[1]);
       stock.update(item);
     // } else {
     //   // Add the item
@@ -128,7 +157,6 @@ function updateStock(formName, location) {
   var flavors = new CFlavors();
   var flavor = flavors.list.find(x => x.formName == formName);
   var recipe = new CBatchRecipes().list.filter(x => x.name == flavor.name);
-
   for (var value in stock.list) {
     for (var item in recipe) {
       // If the recipe uses an ingredient
@@ -137,7 +165,8 @@ function updateStock(formName, location) {
         var remaining = stock.list[value].amount - recipe[item].amount;
         // Logger.log(stockValues[value] + ' remaining: ' + remaining);
         stock.list[value].amount = remaining;
-        stock.update(stock.list[value]);        
+        Logger.log(`Updating stock for ${stock.list[value].name}`);
+        // stock.update(stock.list[value]);        
       }
     }
   }
