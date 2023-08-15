@@ -27,23 +27,27 @@ function sendInventoryReceivedEmail(location, received, employee) {
   sendNotification(subject, body, NotificationType.Inventory);
 }
 
+function testUpdateInventoryFromShipment() {
+  var shipment = [];
+  shipment.push(['AP Flour', 100, 'lb', 'Lemoore']);
+  shipment.push(['Baking Powder', 10, 'lb', 'Lemoore']);
+  shipment.push(['Cake Flour', 200, 'lb', 'Lemoore']);
+  updateInventoryFromShipment('Lemoore', shipment);
+}
+
 function updateInventoryFromShipment(location, received) {
   Logger.log('Updating inventory for ' + location);
-  var stockRange = getRange(Sheet.Stock);
-  var stockValues = stockRange.getValues();
-
-  // Iterate over the stockRange formValues; updating from the batch we are processing
-  for (var value in stockValues) {
-    for (var item in received) {
-      // If the batch recipe uses an ingredient
-      if (received[item].ingredient === stockValues[value][0] && location === stockValues[value][3]) {
-        // Increment the stock
-        var remaining = Number(stockValues[value][1]) + convertUom(received[item].uom, stockValues[value][2], received[item].amount);
-        stockValues[value][1] = remaining;        
-      }
+  const stock = new CStock();
+  received.forEach(r => {
+    const item = stock.list.find(x => x.name == r.ingredient && x.location == location);
+    if (item) {
+      stock.update(item);
+    // } else {
+    //   // Add the item
+    //   stock.add(r);
     }
-  }
-  stockRange.setValues(stockValues);
+  });
+  stock.save();
   buildInstructionsDoc();
   return true;
 }

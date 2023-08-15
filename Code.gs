@@ -204,6 +204,7 @@ function setupShippingInputs(formValues, ingredients, uoms, ordinal) {
 }
 
 function updateAllForms() {
+  Logger.log('Updating all forms from data source');
   var users = (new CUsers(Sheet.Users).list).sort((x, y) => x - y );
   const locations = getLocations();
   updateLocationsAndEmployees(getDrive(DriveName.ClassicChocolateChip), users, locations);
@@ -453,9 +454,13 @@ function testGetRange() {
   const users = new CUsers().list.forEach(u => { Logger.log(u.name)});
 }
 
-function getRange(name) {
+function getSheet(name) {
   var wb = SpreadsheetApp.openByUrl(getSpreadsheet());
-  var sheet = wb.getSheetByName(name);
+  return wb.getSheetByName(name);
+}
+
+function getRange(name) {
+  var sheet = getSheet(name);
   return sheet.getDataRange();
 }
 
