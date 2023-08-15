@@ -2,9 +2,9 @@ class FrozenItem {
   constructor(id, data) {
     this.id = id;
     this.name = data[0];
-    this.count = Number(data[1] ?? 0);
+    this.count = Number(data[1] ?? 0).toFixed(0);
     this.location = data[2];
-    this.actual = Number(data[3] ?? 0);
+    this.actual = Number(data[3] ?? 0).toFixed(0);
   }
 }
 
