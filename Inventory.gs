@@ -2,8 +2,8 @@ function updateInventoryFromShippingSpreadsheet(ss) {
   var sheet = ss.getSheetByName('Shipment');
   var range = sheet.getDataRange();
   var values = range.getValues();
-  var location = values[1][4];
-  var employee = values[1][5];
+  var location = values[1][5];
+  var employee = values[1][6];
   const ui = SpreadsheetApp.getUi();
   // Add some validation for the form
   if (!location) {
@@ -28,7 +28,7 @@ function updateInventoryFromShippingSpreadsheet(ss) {
   var shipment = [];
   for (index in values) {
     var item = values[index];
-    if (index > 0) {
+    if (index > 1) {
       if (item[0] && item[1]) {
         if (!item[2]) {
           // Throw this back to the user
@@ -41,7 +41,7 @@ function updateInventoryFromShippingSpreadsheet(ss) {
           ui.alert('Invalid Request', message, Browser.Buttons.OK);
           return false;
         }
-        shipment.push([item[0], item[1], item[2], item[3], location]);
+        shipment.push([item[0], item[1], item[2], item[3], item[4], location]);
         values[index][1] = null;
       }
     }
@@ -56,10 +56,10 @@ function updateInventoryFromShippingSpreadsheet(ss) {
 
 function testUpdateInventoryFromShipment() {
   var shipment = [];
-  shipment.push(['AP Flour', 100, 'lb', 'kg', 'Lemoore']);
-  shipment.push(['Baking Powder', 10, 'lb', 'kg', 'Lemoore']);
-  shipment.push(['Cake Flour', 200, 'lb', 'kg', 'Lemoore']);
-  shipment.push(['Eggs', 300, 'u', 'u', 'Lemoore']);
+  shipment.push(['AP Flour', 100, 'lb', 'kg', 15, 'Lemoore']);
+  shipment.push(['Baking Powder', 10, 'lb', 'kg', 0.3, 'Lemoore']);
+  shipment.push(['Cake Flour', 200, 'lb', 'kg', 20, 'Lemoore']);
+  shipment.push(['Eggs', 300, 'u', 'u', 128, 'Lemoore']);
   updateInventoryFromShipment('Lemoore', shipment);
 }
 
@@ -75,14 +75,14 @@ function updateInventoryFromShipment(location, received) {
     } else {
       // Add the item with the conversion
       const amount = convertUom(r[2], r[3], r[1]);
-      stock.add([r[0], amount, r[3], location]);
+      stock.add([r[0], amount, r[3], location, r[4]]);
     }
   });
   stock.save();
   if (stock.added && stock.added.length > 0) {
     const ui = SpreadsheetApp.getUi();
     var confirm = ui.alert('New Inventory Type',
-    `You have added ${stock.added.length} new items to inventory for the ${location} location.\nClick "Yes" to add the new items`, 
+    `You have added ${stock.added.length} new ${stock.added.length > 1 ? 'items' : 'item'} to inventory for the ${location} location.\nClick "Yes" to add the new items`, 
     Browser.Buttons.YES_NO);
     if (confirm == ui.Button.YES) {
       stock.added.forEach(a => stock.sheet.appendRow(a));
