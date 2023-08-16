@@ -31,11 +31,11 @@ function onReceivedShipment(e) {
   var received = [];
   var location = formValues['Where are you working today?'][0];
   var employee = formValues['Who are you?'][0];
-  processShippingInput(received, formValues, '1st');
-  processShippingInput(received, formValues, '2nd');
-  processShippingInput(received, formValues, '3rd');
-  processShippingInput(received, formValues, '4th');
-  processShippingInput(received, formValues, '5th');
+  processShippingInput(received, formValues, '1st', location);
+  processShippingInput(received, formValues, '2nd', location);
+  processShippingInput(received, formValues, '3rd', location);
+  processShippingInput(received, formValues, '4th', location);
+  processShippingInput(received, formValues, '5th', location);
   if (updateInventoryFromShipment(location, received)) {
     sendInventoryReceivedEmail(location, received, employee);
   }
@@ -82,14 +82,16 @@ function updateInventoryFromShipment(location, received) {
 }
 
 
-function processShippingInput(received, formValues, ordinal) {
+function processShippingInput(received, formValues, ordinal, location) {
   var value = formValues['Enter Amount Received (' + ordinal + ')'][0];
   if (value > 0) {
-    received.push({
-      'ingredient': formValues['Select Ingredient (' + ordinal + ')'][0],
-      'uom': formValues['Select Unit of Measure (' + ordinal + ')'][0],
-      'amount': formValues['Enter Amount Received (' + ordinal +')'][0]
-    });
+    received.push(
+      [
+        formValues['Select Ingredient (' + ordinal + ')'][0],
+        formValues['Enter Amount Received (' + ordinal + ')'][0],
+        formValues['Select Unit of Measure (' + ordinal + ')'][0],
+        location
+      ]);
   }
 }
 
