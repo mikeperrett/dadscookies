@@ -12,6 +12,7 @@ class StockItem {
 
 class CStock {
   constructor() {
+    this.added = [];
     this.sheet = getSheet(Sheet.Stock);
     this.range = this.sheet.getDataRange();
     this.values = this.range.getValues();
@@ -22,7 +23,7 @@ class CStock {
       }
     }
     this.update = function(data) {
-      if (data.id >= 0) {
+      if (data.id && data.id >= 0) {
         this.values[data.id] = [data.name, data.amount, data.uom, data.location, data.minimum, data.actual];
       }
     }
@@ -30,8 +31,7 @@ class CStock {
       const id = Math.max(...this.list.map(x => x.id)) + 1;
       const item = new StockItem(id, data);
       this.list.push(item);
-      this.values.push(data);
-      this.sheet.appendRow(data);
+      this.added.push([item.name, item.amount, item.uom, item.location, item.minimum, item.actual]);
     }
     this.save = function() {
       this.range.setValues(this.values);

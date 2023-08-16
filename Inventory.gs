@@ -2,20 +2,48 @@ function updateInventoryFromShippingSpreadsheet(ss) {
   var sheet = ss.getSheetByName('Shipment');
   var range = sheet.getDataRange();
   var values = range.getValues();
-  var location = values[1][3];
-  var employee = values[1][4];
-  var confirm = Browser.msgBox(
-    `Are you sure that you want to add these items to your inventory for the ${location} location?`, 
+  var location = values[1][4];
+  var employee = values[1][5];
+  const ui = SpreadsheetApp.getUi();
+  // Add some validation for the form
+  if (!location) {
+    ui.alert('Shipment Recieved', 'You must select a Location to submit this shipment to inventory', Browser.Buttons.OK);
+    return false;
+  }
+  if (!employee) {
+    ui.alert('Shipment Recieved', 'You must select an Employee to submit this shipment to inventory', Browser.Buttons.OK);
+    return false;
+  }
+  const amounts = values.filter(x => x[1] && x[1] != 'Amount').map(x => x[1]) ?? 0;
+  if (amounts.length == 0) {
+    ui.alert('Shipment Recieved', 'You must enter an amount to submit this shipment to inventory', Browser.Buttons.OK);
+    return false;
+  }
+  var confirm = ui.alert('Shipment Recieved', 
+    `Are you sure that you want to update inventory at ${location.toLocaleUpperCase()}`, 
     Browser.Buttons.YES_NO);
-  if (confirm != 'yes') {
+  if (confirm != ui.Button.YES) {
     return false;
   }
   var shipment = [];
   for (index in values) {
     var item = values[index];
-    if (index > 0 && item[1]) {
-      shipment.push([item[0], item[1], item[2], location]);
-      values[index][1] = null;
+    if (index > 0) {
+      if (item[0] && item[1]) {
+        if (!item[2]) {
+          // Throw this back to the user
+          var message = `Missing "Received UOM" for "${item[0]}"`;
+          ui.alert('Invalid Request', message, Browser.Buttons.OK);
+          return false;
+        }
+        if (!item[3]) {
+          var message = `Missing "Location UOM" for "${item[0]}"`;
+          ui.alert('Invalid Request', message, Browser.Buttons.OK);
+          return false;
+        }
+        shipment.push([item[0], item[1], item[2], item[3], location]);
+        values[index][1] = null;
+      }
     }
   }
   if (shipment.length) {
@@ -24,6 +52,45 @@ function updateInventoryFromShippingSpreadsheet(ss) {
       range.setValues(values);
     }
   }
+}
+
+function testUpdateInventoryFromShipment() {
+  var shipment = [];
+  shipment.push(['AP Flour', 100, 'lb', 'kg', 'Lemoore']);
+  shipment.push(['Baking Powder', 10, 'lb', 'kg', 'Lemoore']);
+  shipment.push(['Cake Flour', 200, 'lb', 'kg', 'Lemoore']);
+  shipment.push(['Eggs', 300, 'u', 'u', 'Lemoore']);
+  updateInventoryFromShipment('Lemoore', shipment);
+}
+
+function updateInventoryFromShipment(location, received) {
+  Logger.log('Updating inventory for ' + location);
+  const stock = new CStock();
+  received.forEach(r => {
+    const item = stock.list.find(x => x.name == r[0] && x.location == location);
+    if (item) {
+      Logger.log(`Updating item: ${item.name}`);
+      item.amount += convertUom(r[2], r[3], r[1]);
+      stock.update(item);
+    } else {
+      // Add the item with the conversion
+      const amount = convertUom(r[2], r[3], r[1]);
+      stock.add([r[0], amount, r[3], location]);
+    }
+  });
+  stock.save();
+  if (stock.added && stock.added.length > 0) {
+    const ui = SpreadsheetApp.getUi();
+    var confirm = ui.alert('New Inventory Type',
+    `You have added ${stock.added.length} new items to inventory for the ${location} location.\nClick "Yes" to add the new items`, 
+    Browser.Buttons.YES_NO);
+    if (confirm == ui.Button.YES) {
+      stock.added.forEach(a => stock.sheet.appendRow(a));
+    }
+  }
+
+  buildInstructionsDoc();
+  return true;
 }
 
 function onReceivedShipment(e) {
@@ -53,34 +120,6 @@ function sendInventoryReceivedEmail(location, received, employee) {
   }
   sendNotification(subject, body, NotificationType.Inventory);
 }
-
-function testUpdateInventoryFromShipment() {
-  var shipment = [];
-  shipment.push(['AP Flour', 100, 'lb', 'Lemoore']);
-  shipment.push(['Baking Powder', 10, 'lb', 'Lemoore']);
-  shipment.push(['Cake Flour', 200, 'lb', 'Lemoore']);
-  updateInventoryFromShipment('Lemoore', shipment);
-}
-
-function updateInventoryFromShipment(location, received) {
-  Logger.log('Updating inventory for ' + location);
-  const stock = new CStock();
-  received.forEach(r => {
-    const item = stock.list.find(x => x.name == r[0] && x.location == location);
-    if (item) {
-      Logger.log(`Updating item: ${item.name}`);
-      item.amount += convertUom(r[2], item.uom, r[1]);
-      stock.update(item);
-    // } else {
-    //   // Add the item
-    //   stock.add(r);
-    }
-  });
-  stock.save();
-  buildInstructionsDoc();
-  return true;
-}
-
 
 function processShippingInput(received, formValues, ordinal, location) {
   var value = formValues['Enter Amount Received (' + ordinal + ')'][0];
