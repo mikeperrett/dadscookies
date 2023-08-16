@@ -9,11 +9,11 @@ function buildInstructionsDoc() {
   var linkStyle = { [DocumentApp.Attribute.BOLD]: true, [DocumentApp.Attribute.FONT_SIZE]: 12 };
   var tableStyle = { [DocumentApp.Attribute.BOLD]: true, [DocumentApp.Attribute.FONT_SIZE]: 10 };
 
-  var par = body.appendParagraph((version == 0) ? 'Dads Cookies (Beta)' : 'Dads Cookies');
+  var par = body.appendParagraph(beta ? 'Dads Cookies (Beta)' : 'Dads Cookies');
   par.setAttributes(titleStyle);
   par.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
   const date = new Date().toLocaleString();
-  par = body.appendParagraph(`${date} - Version ${version}`);
+  par = body.appendParagraph(`${date} - Version ${current}`);
   par.setAttributes(textStyle);
   par.setLineSpacing(3);
   par.setAlignment(DocumentApp.HorizontalAlignment.CENTER);

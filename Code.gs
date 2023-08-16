@@ -1,4 +1,6 @@
-const version = 14;
+const released = PropertiesService.getScriptProperties().getProperty('version');
+const current = 16;
+const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
 
@@ -48,14 +50,14 @@ const DriveName = {
 }
 
 function getSpreadsheet() {
-  if (version == 0) {
+  if (beta) {
     return STOCK_WB_DEV;
   }
   return STOCK_WB;
 }
 
 function getDrive(name) {
-  if (version == 0) {
+  if (beta) {
     // Dev documents
     switch (name) {
       case DriveName.ClassicChocolateChip: return '1Jy7C8YHgSmgqr2nDYRMmSWMs56LCusxj7zjQ7t9_6V0';
@@ -111,7 +113,7 @@ function doGet() {
   // });
   // return ContentService.createTextOutput(content);
   // return HtmlService.createHtmlOutput('<h1>Hello There</h1');
-  return ContentService.createTextOutput('Version: ' + version);
+  return ContentService.createTextOutput(`Released ${released}, Current: ${version}`);
 //   return HtmlService.createHtmlOutputFromFile('index');
 }
 
@@ -399,7 +401,7 @@ function testSendNotification() {
 function sendNotification(subject, body, type) {  
   var recipients = new CUsers().list; 
   // If this is dev version; append -DEV to the subject
-  if (version == 0) {
+  if (beta) {
     subject += ' (Beta Version)'
   }
   recipients.forEach(user => {
