@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 17;
+const current = 18;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -113,7 +113,7 @@ function doGet() {
   // });
   // return ContentService.createTextOutput(content);
   // return HtmlService.createHtmlOutput('<h1>Hello There</h1');
-  return ContentService.createTextOutput(`Released ${released}, Current: ${version}`);
+  return ContentService.createTextOutput(`Released ${released}, Current: ${current}`);
 //   return HtmlService.createHtmlOutputFromFile('index');
 }
 
