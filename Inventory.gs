@@ -47,7 +47,7 @@ function updateInventoryFromShippingSpreadsheet(ss) {
     }
   }
   if (shipment.length) {
-    if (updateInventoryFromShipment(location, shipment)) {
+    if (updateInventoryFromShipment(location, shipment, DriveType.Spreadsheet)) {
       sendInventoryReceivedEmail(location, shipment, employee);
       range.setValues(values);
     }
@@ -60,10 +60,10 @@ function testUpdateInventoryFromShipment() {
   shipment.push(['Baking Powder', 10, 'lb', 'kg', 0.3, 'Lemoore']);
   shipment.push(['Cake Flour', 200, 'lb', 'kg', 20, 'Lemoore']);
   shipment.push(['Eggs', 300, 'u', 'u', 128, 'Lemoore']);
-  updateInventoryFromShipment('Lemoore', shipment);
+  updateInventoryFromShipment('Lemoore', shipment, DriveType.Spreadsheet);
 }
 
-function updateInventoryFromShipment(location, received) {
+function updateInventoryFromShipment(location, received, driveType) {
   Logger.log('Updating inventory for ' + location);
   const stock = new CStock();
   received.forEach(r => {
@@ -79,7 +79,8 @@ function updateInventoryFromShipment(location, received) {
     }
   });
   stock.save();
-  if (stock.added && stock.added.length > 0) {
+  // We only add new inventory types from the spreadsheet
+  if (driveType == DriveType.Spreadsheet && stock.added && stock.added.length > 0) {
     const ui = SpreadsheetApp.getUi();
     var confirm = ui.alert('New Inventory Type',
     `You have added ${stock.added.length} new ${stock.added.length > 1 ? 'items' : 'item'} to inventory for the ${location} location.\nClick "Yes" to add the new items`, 
@@ -103,7 +104,7 @@ function onReceivedShipment(e) {
   processShippingInput(received, formValues, '3rd', location);
   processShippingInput(received, formValues, '4th', location);
   processShippingInput(received, formValues, '5th', location);
-  if (updateInventoryFromShipment(location, received)) {
+  if (updateInventoryFromShipment(location, received, DriveType.Form)) {
     sendInventoryReceivedEmail(location, received, employee);
   }
 }
