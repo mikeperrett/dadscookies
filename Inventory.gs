@@ -207,8 +207,7 @@ function updateStock(formName, location) {
         var remaining = stock.list[value].amount - recipe[item].amount;
         // Logger.log(stockValues[value] + ' remaining: ' + remaining);
         stock.list[value].amount = remaining;
-        Logger.log(`Updating stock for ${stock.list[value].name}`);
-        // stock.update(stock.list[value]);        
+        stock.update(stock.list[value]);        
       }
     }
   }

@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 20;
+const current = 21;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -320,7 +320,7 @@ function updateSpecialCookie(formId, data) {
     .setConfirmationMessage('Thanks for your help in making a successful batch!')
     .setAllowResponseEdits(false)
     .setAcceptingResponses(true);
-  form.setShowLinkToRespondAgain(true);
+  form.setShowLinkToRespondAgain(false);
   var questions = form.getItems();
   setQuestion(form, questions, 'Step 1', data.step1);
   setQuestion(form, questions, 'Step 2', data.step2);
@@ -374,6 +374,7 @@ function updateCookieCounter(flavors) {
 // Update locations and employees list in all forms
 function updateLocationsAndEmployees(formId, users, locations) {
   var form = FormApp.openById(formId);
+  form.setShowLinkToRespondAgain(false);
   // Update some formValues from the ss
   var questions = form.getItems();
 
