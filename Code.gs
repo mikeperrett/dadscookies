@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 19;
+const current = 20;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -48,17 +48,13 @@ const DriveName = {
   Instructions: 'Instructions',
   Stock: 'Stock',
   CookieCounter: 'CookieCounter',
-  CookieCounterLink: 'CookieCounterLink',
+  CookieCounterClient: 'CookieCounterClient',
   ShipmentReceivedMobile: 'ShipmentReceived',
-  ShipmentReceivedMobileLink: 'ShipmentReceivedLink',
-  ShippingReceivedWb: 'ShippingReceivedWb'
-}
-
-function getSpreadsheet() {
-  if (beta) {
-    return STOCK_WB_DEV;
-  }
-  return STOCK_WB;
+  ShipmentReceivedMobileClient: 'ShipmentReceivedClient',
+  ShippingReceivedWb: 'ShippingReceivedWb',
+  RawInventory: 'RawInventory',
+  FrozenInventory: 'FrozenInventory',
+  DailyBatchProgress: 'DailyBatchProgress'
 }
 
 function getDrive(name) {
@@ -76,13 +72,17 @@ function getDrive(name) {
       case DriveName.SpecialCookieOne: return '13EY_FRoaChO6oi6TcLNrXLsjS9u47QWAB_TjvT-TtBU';
       case DriveName.SpecialCookieTwo: return '1oxC2x0_ZiqCgaVYzGbtQ-KcQ8KAOzWaM0O8fCxD5K8o';
       case DriveName.CookieCounter: return '1LGhaUbGJgqPzrM3IoV9AZXl54YAwYKTtekR1-fuVrrQ';
-      case DriveName.CookieCounterLink: return 'https://forms.gle/2RAEmXgGGCetBcYj9';
+      case DriveName.CookieCounterClient: return '1FAIpQLScvlogtKjI4m-lDgXn3esJE1uRxIbyuyH8AzBtnQ2pOXq6ivA';
       case DriveName.ShipmentRecievedDesktop: return '1GcBDH5xfgMC3ivkHEA4C-FacedbWwX-V1YKhSTIgdQw';
       case DriveName.ShipmentReceivedMobile: return '17H7waNlHMwgNn-fUFY2cy7BdvlgMKz0bRRT3FNX_0KY';
-      case DriveName.ShipmentReceivedMobileLink: return 'https://forms.gle/MAJiN8RyqjV633EbA';
+      case DriveName.ShipmentReceivedMobileClient: return '1FAIpQLSfVUjVDZXvJ90HTMTJab_klWEsiyQ-9rY7mC9mtlcT5V4xgjA';
       case DriveName.Instructions: return '1cDix6Q9BBhXadZMinHUihUAytfCxrHA58AaPNpUhbQw';
       case DriveName.ShippingReceivedWb: return 'https://docs.google.com/spreadsheets/d/1GcBDH5xfgMC3ivkHEA4C-FacedbWwX-V1YKhSTIgdQw';
-      case DriveName.Stock: return STOCK_WB_DEV;
+      case DriveName.Stock: return 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
+      case DriveName.RawInventory: return '1m8lhEwUZT204PZ3J942UzzCyyv6BpsWdfLrAGtK0YnU';
+      case DriveName.FrozenInventory: return '1hIaWOKvxEchqB_uSu74JVqxZdPSthe92i8M5DnMka88';
+      case DriveName.DailyBatchProgress: return '15W_orlUMLPOTeXbVxaKOEQ5tf-MfOnnGqlfNXeNbC9s';
+
     }
   } else {
     // Production documents
@@ -98,13 +98,16 @@ function getDrive(name) {
       case DriveName.SpecialCookieOne: return '1iUJezM6gziCGkDSzcO4HPsWvMVbcyy9nQBH7TFcM2IA';
       case DriveName.SpecialCookieTwo: return '1WK8NEaiLbEOTDDUwPWKrjxhIY6ocUjKXSuqgjqAl38A';
       case DriveName.CookieCounter: return '1ImDLQuuR5BdacaLSedMpF4uLvrOMwpq7he1mXVnb7c8';
-      case DriveName.CookieCounterLink: return 'https://forms.gle/euDXKCU7niYmb1ct9';
+      case DriveName.CookieCounterClient: return '1FAIpQLSfNDIkgsvOYEFEn6Jffsi-HuQXNXSbsT7bLOeVek_SXWlV7gA';
       case DriveName.ShipmentRecievedDesktop: return '1-x1QNOMd9YnawMjbUbT7sAsTCyV0DQ0rkDhu5J19rAY';
       case DriveName.ShipmentReceivedMobile: return '1yVJStpXYfMnCk4xpYNZczBk66hrUiD-wPF8GQAa5wKc';
-      case DriveName.ShipmentReceivedMobileLink: return 'https://forms.gle/mnT5KE2xCNMkDGcv5';
+      case DriveName.ShipmentReceivedMobileClient: return '1FAIpQLSfcm6CFK2hrJBKQLxjfwZo_NzXFnQNh_mUG1uaW8kvvcFocpw';
       case DriveName.Instructions: return '1g9ogRragAO1qg4WghPGyZS-9Xm9ROYU0zqSpYRbFCs4';
       case DriveName.ShippingReceivedWb: return 'https://docs.google.com/spreadsheets/d/1-x1QNOMd9YnawMjbUbT7sAsTCyV0DQ0rkDhu5J19rAY';
-      case DriveName.Stock: return STOCK_WB;
+      case DriveName.Stock: return 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
+      case DriveName.RawInventory: return '1Tf-bSkhjXMsT33wlWatRKVGmjqwDRMSc8ZsT2mA-pMM';
+      case DriveName.FrozenInventory: return '1DsBU3sLgsf4Dln6V8y2OoTGrC9iWyag1bxk56azIsxg';
+      case DriveName.DailyBatchProgress: return '1U2ajW0PVqSfNxBUdudpsJFp6hPtTeVNcf5EnAYv4U1Q';
     }
   }
 }
@@ -462,7 +465,7 @@ function testGetRange() {
 }
 
 function getSheet(name) {
-  var wb = SpreadsheetApp.openByUrl(getSpreadsheet());
+  var wb = SpreadsheetApp.openByUrl(getDrive(DriveName.Stock));
   return wb.getSheetByName(name);
 }
 
