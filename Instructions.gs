@@ -133,13 +133,13 @@ function buildInstructionsDoc() {
   par.setAttributes(styles.linkStyle)
   par.setLineSpacing(2);
 
-  par = body.appendParagraph('Shipment Received (Desktop)');
-  styles.linkStyle[DocumentApp.Attribute.LINK_URL] = getDrive(DriveName.ShippingReceivedWb);
+  par = body.appendParagraph('Shipment Received Form');
+  styles.linkStyle[DocumentApp.Attribute.LINK_URL] = `${formsRoot}${getDrive(DriveName.ShipmentReceivedMobileClient)}/viewform`;
   par.setAttributes(styles.linkStyle)
   par.setLineSpacing(2);
 
-  par = body.appendParagraph('Shipment Received (mobile)');
-  styles.linkStyle[DocumentApp.Attribute.LINK_URL] = `${formsRoot}${getDrive(DriveName.ShipmentReceivedMobileClient)}/viewform`;
+  par = body.appendParagraph('Shipment Received (Administrator)');
+  styles.linkStyle[DocumentApp.Attribute.LINK_URL] = getDrive(DriveName.ShippingReceivedWb);
   par.setAttributes(styles.linkStyle)
   par.setLineSpacing(2);
   
