@@ -138,9 +138,13 @@ function buildInstructionsDoc() {
   par.setAttributes(styles.linkStyle)
   par.setLineSpacing(2);
 
-  par = body.appendParagraph('Shipment Received (Administrator)');
+  par = body.appendParagraph('Shipment Received (Managerial)');
   styles.linkStyle[DocumentApp.Attribute.LINK_URL] = getDrive(DriveName.ShippingReceivedWb);
   par.setAttributes(styles.linkStyle)
   par.setLineSpacing(2);
   
+  par = body.appendParagraph('Manual Inventory (Managerial)');
+  styles.linkStyle[DocumentApp.Attribute.LINK_URL] = getDrive(DriveName.ManualInventory);
+  par.setAttributes(styles.linkStyle)
+  par.setLineSpacing(2);
 }
