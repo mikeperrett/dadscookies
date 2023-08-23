@@ -44,6 +44,12 @@ function setCurrentInventory(ss) {
     ui.alert('Manual Inventory', 'You must select an Employee to get the current inventory', Browser.Buttons.OK);
     return false;
   }
+    var confirm = ui.alert('Manual Inventory', 
+    `Are you sure that you want to manually set inventory at ${location.toLocaleUpperCase()}`, 
+    Browser.Buttons.YES_NO);
+  if (confirm != ui.Button.YES) {
+    return false;
+  }
   const stock = new CStock();
   for(index in stock.list) {
     const item = values.find(x => x[0] === stock.list[index].name && stock.list[index].location == location);

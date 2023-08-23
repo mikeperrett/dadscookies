@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 23;
+const current = 24;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -83,7 +83,7 @@ function getDrive(name) {
       case DriveName.RawInventory: return '1m8lhEwUZT204PZ3J942UzzCyyv6BpsWdfLrAGtK0YnU';
       case DriveName.FrozenInventory: return '1hIaWOKvxEchqB_uSu74JVqxZdPSthe92i8M5DnMka88';
       case DriveName.DailyBatchProgress: return '15W_orlUMLPOTeXbVxaKOEQ5tf-MfOnnGqlfNXeNbC9s';
-      case DriveName.ManualInventory: return '1wIOjXWdxDPFQaK8cAA0mRFOl1jIXLJdQTWiowvJBDwA';
+      case DriveName.ManualInventory: return 'https://docs.google.com/spreadsheets/d/1wIOjXWdxDPFQaK8cAA0mRFOl1jIXLJdQTWiowvJBDwA';
     }
   } else {
     // Production documents
@@ -109,7 +109,7 @@ function getDrive(name) {
       case DriveName.RawInventory: return '1Tf-bSkhjXMsT33wlWatRKVGmjqwDRMSc8ZsT2mA-pMM';
       case DriveName.FrozenInventory: return '1DsBU3sLgsf4Dln6V8y2OoTGrC9iWyag1bxk56azIsxg';
       case DriveName.DailyBatchProgress: return '1U2ajW0PVqSfNxBUdudpsJFp6hPtTeVNcf5EnAYv4U1Q';
-      case DriveName.ManualInventory: return '1JTBV5dN-WeNPCH3MsjXHZDR0jG58yVoOoPZOcHLlCUQ';
+      case DriveName.ManualInventory: return 'https://docs.google.com/spreadsheets/d/1JTBV5dN-WeNPCH3MsjXHZDR0jG58yVoOoPZOcHLlCUQ';
     }
   }
 }
