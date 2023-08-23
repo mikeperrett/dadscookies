@@ -1,3 +1,63 @@
+function getCurrentInventory(ss) {
+  var sheet = ss.getSheetByName('Inventory');
+  var range = sheet.getDataRange();
+  var values = range.getValues();
+  var location = values[1][3];
+  var employee = values[1][4];
+  const ui = SpreadsheetApp.getUi();
+  // Add some validation for the form
+  if (!location) {
+    ui.alert('Manual Inventory', 'You must select a Location to get the current inventory', Browser.Buttons.OK);
+    return false;
+  }
+  if (!employee) {
+    ui.alert('Manual Inventory', 'You must select an Employee to get the current inventory', Browser.Buttons.OK);
+    return false;
+  }
+  // Get the stock 
+  const stock = new CStock().list;
+  for(index in values) {
+    if (index > 1) {
+      const item = stock.find(x => x.name === values[index][0] && x.location == location);
+      if (item) {
+        values[index][1] = item.amount;
+        values[index][2] = item.uom;
+      }
+    }
+  }
+  range.setValues(values);
+}
+
+function setCurrentInventory(ss) {
+  var sheet = ss.getSheetByName('Inventory');
+  var range = sheet.getDataRange();
+  var values = range.getValues();
+  var location = values[1][3];
+  var employee = values[1][4];
+  const ui = SpreadsheetApp.getUi();
+  // Add some validation for the form
+  if (!location) {
+    ui.alert('Manual Inventory', 'You must select a Location to get the current inventory', Browser.Buttons.OK);
+    return false;
+  }
+  if (!employee) {
+    ui.alert('Manual Inventory', 'You must select an Employee to get the current inventory', Browser.Buttons.OK);
+    return false;
+  }
+  const stock = new CStock();
+  for(index in stock.list) {
+    const item = values.find(x => x[0] === stock.list[index].name && stock.list[index].location == location);
+    if (item) {
+      Logger.log(item);
+      stock.list[index].amount = item[1];
+      stock.list[index].uom = item[2];
+      Logger.log(stock.list[index]);
+      stock.update(stock.list[index]);
+    }
+  }
+  stock.save();
+}
+
 function updateInventoryFromShippingSpreadsheet(ss) {
   var sheet = ss.getSheetByName('Shipment');
   var range = sheet.getDataRange();

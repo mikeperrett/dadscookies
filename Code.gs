@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 22;
+const current = 23;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -54,7 +54,8 @@ const DriveName = {
   ShippingReceivedWb: 'ShippingReceivedWb',
   RawInventory: 'RawInventory',
   FrozenInventory: 'FrozenInventory',
-  DailyBatchProgress: 'DailyBatchProgress'
+  DailyBatchProgress: 'DailyBatchProgress',
+  ManualInventory: 'ManualInventory'
 }
 
 function getDrive(name) {
@@ -82,7 +83,7 @@ function getDrive(name) {
       case DriveName.RawInventory: return '1m8lhEwUZT204PZ3J942UzzCyyv6BpsWdfLrAGtK0YnU';
       case DriveName.FrozenInventory: return '1hIaWOKvxEchqB_uSu74JVqxZdPSthe92i8M5DnMka88';
       case DriveName.DailyBatchProgress: return '15W_orlUMLPOTeXbVxaKOEQ5tf-MfOnnGqlfNXeNbC9s';
-
+      case DriveName.ManualInventory: return '1wIOjXWdxDPFQaK8cAA0mRFOl1jIXLJdQTWiowvJBDwA';
     }
   } else {
     // Production documents
@@ -108,6 +109,7 @@ function getDrive(name) {
       case DriveName.RawInventory: return '1Tf-bSkhjXMsT33wlWatRKVGmjqwDRMSc8ZsT2mA-pMM';
       case DriveName.FrozenInventory: return '1DsBU3sLgsf4Dln6V8y2OoTGrC9iWyag1bxk56azIsxg';
       case DriveName.DailyBatchProgress: return '1U2ajW0PVqSfNxBUdudpsJFp6hPtTeVNcf5EnAYv4U1Q';
+      case DriveName.ManualInventory: return '1JTBV5dN-WeNPCH3MsjXHZDR0jG58yVoOoPZOcHLlCUQ';
     }
   }
 }
@@ -121,7 +123,7 @@ function doGet() {
   // });
   // return ContentService.createTextOutput(content);
   // return HtmlService.createHtmlOutput('<h1>Hello There</h1');
-  return ContentService.createTextOutput(`Released ${released}, Current: ${current}`);
+  return ContentService.createTextOutput(`Released ${released}, Current: ${current}(${beta ? 'Beta' : 'Released'})`);
 //   return HtmlService.createHtmlOutputFromFile('index');
 }
 
