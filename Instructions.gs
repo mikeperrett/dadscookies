@@ -138,6 +138,11 @@ function buildInstructionsDoc() {
   par.setAttributes(styles.linkStyle)
   par.setLineSpacing(2);
 
+  par = body.appendParagraph('Manual Inventory Form');
+  styles.linkStyle[DocumentApp.Attribute.LINK_URL] = `${formsRoot}${getDrive(DriveName.ManualInventoryFormClient)}/viewform`;
+  par.setAttributes(styles.linkStyle)
+  par.setLineSpacing(2);
+
   addHeader(body, styles, 'Management');
 
   par = body.appendParagraph('Shipment Received');
