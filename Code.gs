@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 25;
+const current = 26;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -49,13 +49,16 @@ const DriveName = {
   Stock: 'Stock',
   CookieCounter: 'CookieCounter',
   CookieCounterClient: 'CookieCounterClient',
+  ShipmentRecievedDesktop: 'ShipmentReceivedDesktop',
   ShipmentReceivedMobile: 'ShipmentReceived',
   ShipmentReceivedMobileClient: 'ShipmentReceivedClient',
   ShippingReceivedWb: 'ShippingReceivedWb',
   RawInventory: 'RawInventory',
   FrozenInventory: 'FrozenInventory',
   DailyBatchProgress: 'DailyBatchProgress',
-  ManualInventory: 'ManualInventory'
+  ManualInventory: 'ManualInventory',
+  ManualInventoryForm: 'ManualInventoryForm',
+  ManualInventoryFormClient: 'ManualInventoryFormClient',
 }
 
 function getDrive(name) {
@@ -84,6 +87,8 @@ function getDrive(name) {
       case DriveName.FrozenInventory: return '1hIaWOKvxEchqB_uSu74JVqxZdPSthe92i8M5DnMka88';
       case DriveName.DailyBatchProgress: return '15W_orlUMLPOTeXbVxaKOEQ5tf-MfOnnGqlfNXeNbC9s';
       case DriveName.ManualInventory: return 'https://docs.google.com/spreadsheets/d/1wIOjXWdxDPFQaK8cAA0mRFOl1jIXLJdQTWiowvJBDwA';
+      case DriveName.ManualInventoryForm: return '1LilmK5Vxgm5ZF2ELPNNL8a3xGNuPV7sHpomleCsWTrU';
+      case DriveName.ManualInventoryFormClient: return '1FAIpQLSc8xGAKIJjR-eGqzKBxAYrnxlCpvGJDvdclZhdXgQ9hNVul0Q';
     }
   } else {
     // Production documents
@@ -110,6 +115,8 @@ function getDrive(name) {
       case DriveName.FrozenInventory: return '1DsBU3sLgsf4Dln6V8y2OoTGrC9iWyag1bxk56azIsxg';
       case DriveName.DailyBatchProgress: return '1U2ajW0PVqSfNxBUdudpsJFp6hPtTeVNcf5EnAYv4U1Q';
       case DriveName.ManualInventory: return 'https://docs.google.com/spreadsheets/d/1JTBV5dN-WeNPCH3MsjXHZDR0jG58yVoOoPZOcHLlCUQ';
+      case DriveName.ManualInventoryForm: return '14QDyafFw_R99wfhLiMUNcP_JAv_gBHk3qEVxjrgj_ic';
+      case DriveName.ManualInventoryFormClient: return '1FAIpQLSdzVFEH7dscHA-7AFrKcqBHGUyUgXU98_vvHHQTNwe2DJSOAA';
     }
   }
 }
@@ -152,11 +159,6 @@ function getLocations() {
 
 function getData() {
   var x = new CBatchRecipes();
-  // for(index in x.list) {
-  //   var u = x.list[index];
-  //   Logger.log(u.id + ', ' + u.name + ', ' + u.email + ', ' + u.batchNotifications + ', ' + u.inventoryNotifications);
-  // }
-
   var obj = x.recipeList('Smores (170)').sort((x, y) => x.order > y.order );
   if (obj) {
     for (o in obj) {
@@ -192,6 +194,44 @@ function updateShippingForm() {
   setupShippingInputs(formValues, ingredients, uoms, '3rd');
   setupShippingInputs(formValues, ingredients, uoms, '4th');
   setupShippingInputs(formValues, ingredients, uoms, '5th');
+}
+
+function updateManualInventoryForm() {
+  const form = FormApp.openById(getDrive(DriveName.ManualInventoryForm));
+  const inventoryInputSheet = SpreadsheetApp.openById(getDrive(DriveName.ShipmentRecievedDesktop));
+  var data = inventoryInputSheet.getSheetByName('Shipment').getDataRange().getValues();
+  var ingredients = [];
+  for (x in data) {
+    if (x > 1) {
+      ingredients.push(data[x]);
+    }
+  }
+  var formValues = form.getItems();
+  form.setTitle('Manual Inventory Input')
+    .setDescription('Enter all inventory items listed below in the Unit of Measure required')
+    .setConfirmationMessage('Thanks for your help in keeping our inventory current!')
+    .setAllowResponseEdits(false)
+    .setAcceptingResponses(true);
+  form.setShowLinkToRespondAgain(false);
+
+  var validation = FormApp.createTextValidation()
+    .setHelpText('You must enter a number greater than or equal to zero')
+    .requireNumberGreaterThanOrEqualTo(0)
+    .build();
+  for(index = 0; index < ingredients.length; index++) {
+    const i = ingredients[index];
+    if (index + 2 < formValues.length) {
+      updateFormField(formValues[index + 2].asTextItem(), i, validation);
+    } else {
+      updateFormField(form.addTextItem(), i, validation);
+    }
+  }
+}
+
+function updateFormField(item, ingredient, validation) {
+  item.setTitle(`${ingredient[0]} (${ingredient[2]})`);
+  item.setValidation(validation);
+  item.setRequired(true);
 }
 
 function setupShippingInputs(formValues, ingredients, uoms, ordinal) {
@@ -231,11 +271,13 @@ function updateAllForms() {
   updateLocationsAndEmployees(getDrive(DriveName.SpecialCookieOne), users, locations);
   updateLocationsAndEmployees(getDrive(DriveName.SpecialCookieTwo), users, locations);
   updateLocationsAndEmployees(getDrive(DriveName.ShipmentReceivedMobile), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.ManualInventoryForm), users, locations);
   
   var recipes = new CBatchRecipes().list;
   var specialFlavors = getSpecials();
   updateCookieCounter(specialFlavors);
   updateShippingForm();
+  updateManualInventoryForm();
 
   // Update the special cookies that are enabled
   for (s in specialFlavors) {

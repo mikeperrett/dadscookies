@@ -1,3 +1,28 @@
+
+function updateInventoryFromManualForm(e) {
+  Logger.log('Update inventory from Manual Inventory Form');
+  const stock = new CStock();
+  var location = e.namedValues['Where are you working today?'][0];
+  // Get the uom's; received and stored from the 'ShipmentManagerInput' spreadsheet from which the input form was built
+  const ss = SpreadsheetApp.openById(getDrive(DriveName.ShipmentRecievedDesktop))
+  const stockWithUoms = ss.getSheetByName('Shipment').getDataRange().getValues();
+  for(var key in e.namedValues) {    
+    const amount = e.namedValues[key];
+    const stockItem = stock.list.find(x => key.indexOf(x.name) == 0 && x.location == location);
+    if (stockItem) {
+      stockWithUoms.forEach(row => {
+        if (stockItem.name == row[0]) {
+          stockItem.amount = convertUom(row[2], row[3], amount);
+          // Logger.log(`Ingredient: ${key}, Amount: ${amount}, Item: ${stockItem.name}, FormUom: ${row[2]}, StoreUom: ${row[3]}, Converted: ${stockItem.amount}`);
+          stock.update(stockItem);
+        }
+      });
+    }
+  }
+  stock.save();
+  buildInstructionsDoc();
+}
+
 function getCurrentInventory(ss) {
   var sheet = ss.getSheetByName('Inventory');
   var range = sheet.getDataRange();
