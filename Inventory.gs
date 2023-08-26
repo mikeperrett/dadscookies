@@ -27,8 +27,8 @@ function getCurrentInventory(ss) {
   var sheet = ss.getSheetByName('Inventory');
   var range = sheet.getDataRange();
   var values = range.getValues();
-  var location = values[1][3];
-  var employee = values[1][4];
+  var location = values[1][4];
+  var employee = values[1][5];
   const ui = SpreadsheetApp.getUi();
   // Add some validation for the form
   if (!location) {
@@ -45,8 +45,8 @@ function getCurrentInventory(ss) {
     if (index > 1) {
       const item = stock.find(x => x.name === values[index][0] && x.location == location);
       if (item) {
-        values[index][1] = item.amount;
-        values[index][2] = item.uom;
+        values[index][1] = convertUom(values[index][3], values[index][2], item.amount);
+        values[index][3] = item.uom;
       }
     }
   }
@@ -57,8 +57,8 @@ function setCurrentInventory(ss) {
   var sheet = ss.getSheetByName('Inventory');
   var range = sheet.getDataRange();
   var values = range.getValues();
-  var location = values[1][3];
-  var employee = values[1][4];
+  var location = values[1][4];
+  var employee = values[1][5];
   const ui = SpreadsheetApp.getUi();
   // Add some validation for the form
   if (!location) {
@@ -80,8 +80,8 @@ function setCurrentInventory(ss) {
     const item = values.find(x => x[0] === stock.list[index].name && stock.list[index].location == location);
     if (item) {
       Logger.log(item);
-      stock.list[index].amount = item[1];
-      stock.list[index].uom = item[2];
+      stock.list[index].amount = convertUom(item[2], item[3], item[1]);
+      stock.list[index].uom = item[3];
       Logger.log(stock.list[index]);
       stock.update(stock.list[index]);
     }
