@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 27;
+const current = 28;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -214,24 +214,19 @@ function updateManualInventoryForm() {
     .setAcceptingResponses(true);
   form.setShowLinkToRespondAgain(false);
 
-  var validation = FormApp.createTextValidation()
-    .setHelpText('You must enter a number greater than or equal to zero')
-    .requireNumberGreaterThanOrEqualTo(0)
-    .build();
   for(index = 0; index < ingredients.length; index++) {
     const i = ingredients[index];
     if (index + 2 < formValues.length) {
-      updateFormField(formValues[index + 2].asTextItem(), i, validation);
+      updateFormField(formValues[index + 2].asTextItem(), i, false);
     } else {
-      updateFormField(form.addTextItem(), i, validation);
+      updateFormField(form.addTextItem(), i, false);
     }
   }
 }
 
-function updateFormField(item, ingredient, validation) {
+function updateFormField(item, ingredient, required) {
   item.setTitle(`${ingredient[0]} (${ingredient[2]})`);
-  item.setValidation(validation);
-  item.setRequired(true);
+  item.setRequired(required);
 }
 
 function setupShippingInputs(formValues, ingredients, uoms, ordinal) {
@@ -464,13 +459,6 @@ function sendNotification(subject, body, type) {
       }
     }
   });
-  for (index in recipients) {
-    if (index > 0 && recipients[index][1]) {
-      if ((recipients[index][3] == true && type == NotificationType.Batch) || (recipients[index][4] == true && type == NotificationType.Inventory)) {
-        MailApp.sendEmail(recipients[index][1], subject, body);
-      }
-    }
-  }
 }
 
 function formSubmitted(e) {

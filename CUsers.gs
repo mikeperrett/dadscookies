@@ -15,7 +15,7 @@ class CUsers {
     this.values = this.range.getValues();
     this.list = [];
     for (var x in this.values) {
-      if (this.values[x][0]) {
+      if (x > 0 && this.values[x][0]) {
         this.list.push(new User(x, this.values[x]));
       }
     }
