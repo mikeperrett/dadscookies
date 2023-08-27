@@ -8,15 +8,18 @@ function updateInventoryFromManualForm(e) {
   const stockWithUoms = ss.getSheetByName('Shipment').getDataRange().getValues();
   for(var key in e.namedValues) {    
     const amount = e.namedValues[key];
-    const stockItem = stock.list.find(x => key.indexOf(x.name) == 0 && x.location == location);
-    if (stockItem) {
-      stockWithUoms.forEach(row => {
-        if (stockItem.name == row[0]) {
-          stockItem.amount = convertUom(row[2], row[3], amount);
-          // Logger.log(`Ingredient: ${key}, Amount: ${amount}, Item: ${stockItem.name}, FormUom: ${row[2]}, StoreUom: ${row[3]}, Converted: ${stockItem.amount}`);
-          stock.update(stockItem);
-        }
-      });
+    if (amount > 0) {
+      Logger.log(`${key}: ${amount}`)
+      const stockItem = stock.list.find(x => key.indexOf(x.name) == 0 && x.location == location);
+      if (stockItem) {
+        stockWithUoms.forEach(row => {
+          if (stockItem.name == row[0]) {
+            stockItem.amount = convertUom(row[2], row[3], amount);
+            // Logger.log(`Ingredient: ${key}, Amount: ${amount}, Item: ${stockItem.name}, FormUom: ${row[2]}, StoreUom: ${row[3]}, Converted: ${stockItem.amount}`);
+            stock.update(stockItem);
+          }
+        });
+      }
     }
   }
   stock.save();
@@ -47,6 +50,8 @@ function getCurrentInventory(ss) {
       if (item) {
         values[index][1] = convertUom(values[index][3], values[index][2], item.amount);
         values[index][3] = item.uom;
+      } else {
+        values[index][1] = null;
       }
     }
   }
@@ -76,17 +81,26 @@ function setCurrentInventory(ss) {
     return false;
   }
   const stock = new CStock();
-  for(index in stock.list) {
-    const item = values.find(x => x[0] === stock.list[index].name && stock.list[index].location == location);
-    if (item) {
-      Logger.log(item);
-      stock.list[index].amount = convertUom(item[2], item[3], item[1]);
-      stock.list[index].uom = item[3];
-      Logger.log(stock.list[index]);
-      stock.update(stock.list[index]);
+  for(x in values) {
+    if (x > 1) {
+      const item = values[x]
+      const inv = stock.list.find(x => x.name === item[0] && x.location === location);
+      if ((inv && item[1]) || item[1] === 0) {
+        Logger.log(`${item[0]} = [${item[1]}]`);
+        inv.amount = convertUom(item[2], item[3], item[1]);
+        inv.uom = item[3];
+        stock.update(inv);
+      } else if (item[0] && item[1] > 0) {
+        // Add the item with the conversion
+        const amount = convertUom(values[x][2], values[x][3], values[x][1]);
+        stock.add([values[x][0], amount, values[x][3], location, values[x][4]]);
+      }
     }
   }
   stock.save();
+  // We only add new inventory types from the spreadsheet
+  createStockItems(DriveType.Spreadsheet, stock, location);
+  buildInstructionsDoc();
 }
 
 function updateInventoryFromShippingSpreadsheet(ss) {
@@ -159,7 +173,7 @@ function updateInventoryFromShipment(location, received, driveType) {
   const stock = new CStock();
   received.forEach(r => {
     const item = stock.list.find(x => x.name == r[0] && x.location == location);
-    if (item) {
+    if ((item && r[1]) || r[1] === 0) {
       Logger.log(`Updating item: ${item.name}`);
       item.amount += convertUom(r[2], r[3], r[1]);
       stock.update(item);
@@ -171,7 +185,13 @@ function updateInventoryFromShipment(location, received, driveType) {
   });
   stock.save();
   // We only add new inventory types from the spreadsheet
-  if (driveType == DriveType.Spreadsheet && stock.added && stock.added.length > 0) {
+  createStockItems(driveType, stock, location);
+  buildInstructionsDoc();
+  return true;
+}
+
+function createStockItems(driveType, stock, location) {
+   if (driveType == DriveType.Spreadsheet && stock.added && stock.added.length > 0) {
     const ui = SpreadsheetApp.getUi();
     var confirm = ui.alert('New Inventory Type',
     `You have added ${stock.added.length} new ${stock.added.length > 1 ? 'items' : 'item'} to inventory for the ${location} location.\nClick "Yes" to add the new items`, 
@@ -181,8 +201,6 @@ function updateInventoryFromShipment(location, received, driveType) {
     }
   }
 
-  buildInstructionsDoc();
-  return true;
 }
 
 function onReceivedShipment(e) {

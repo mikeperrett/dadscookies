@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 27;
+const current = 30;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -214,24 +214,19 @@ function updateManualInventoryForm() {
     .setAcceptingResponses(true);
   form.setShowLinkToRespondAgain(false);
 
-  var validation = FormApp.createTextValidation()
-    .setHelpText('You must enter a number greater than or equal to zero')
-    .requireNumberGreaterThanOrEqualTo(0)
-    .build();
   for(index = 0; index < ingredients.length; index++) {
     const i = ingredients[index];
     if (index + 2 < formValues.length) {
-      updateFormField(formValues[index + 2].asTextItem(), i, validation);
+      updateFormField(formValues[index + 2].asTextItem(), i, false);
     } else {
-      updateFormField(form.addTextItem(), i, validation);
+      updateFormField(form.addTextItem(), i, false);
     }
   }
 }
 
-function updateFormField(item, ingredient, validation) {
+function updateFormField(item, ingredient, required) {
   item.setTitle(`${ingredient[0]} (${ingredient[2]})`);
-  item.setValidation(validation);
-  item.setRequired(true);
+  item.setRequired(required);
 }
 
 function setupShippingInputs(formValues, ingredients, uoms, ordinal) {
@@ -274,42 +269,13 @@ function updateAllForms() {
   updateLocationsAndEmployees(getDrive(DriveName.ManualInventoryForm), users, locations);
   
   var recipes = new CBatchRecipes().list;
-  var specialFlavors = getSpecials();
-  updateCookieCounter(specialFlavors);
+  var specials = getSpecials();
+  updateCookieCounter(specials);
   updateShippingForm();
   updateManualInventoryForm();
 
   // Update the special cookies that are enabled
-  for (s in specialFlavors) {
-    // Colum two is where it's enabled
-    if (specialFlavors[s].enabled) {
-      var flavor = specialFlavors[s];
-      var step1 = [];
-      var step2 = [];
-      var step3 = [];
-      var step4 = [];
-      for (index in recipes) {
-        var item = recipes[index];
-        if (index > 0 && item.name == flavor.name) {
-          if (item.step == 1) {
-            step1.push(item);
-          } else if (item.step == 2) {
-            step2.push(item);
-          } else if (item.step == 3) {
-            step3.push(item);
-          } else {
-            step4.push(item);
-          }
-        }      
-      }
-      var data = { 'title': flavor.name, 'step1': step1, 'step2': step2, 'step3': step3, 'step4': step4 };
-      if (flavor.formName == DriveName.SpecialCookieOne) {
-        updateSpecialCookie(getDrive(DriveName.SpecialCookieOne), data);
-      } else if (flavor.formName == DriveName.SpecialCookieTwo) {
-        updateSpecialCookie(getDrive(DriveName.SpecialCookieTwo), data);
-      }
-    }
-  }
+  buildSpecialsForms(specials, recipes);
 }
 
 function testGetSpecials() {
@@ -324,15 +290,17 @@ function getSpecials() {
 
 function setQuestion(form, questions, title, steps) {
   var q = questions.findIndex(x => x.getTitle() == title);
-  if (q < 0 && steps.length > 0) { 
+  if (q < 0 && steps && steps.length > 0) { 
     var question = form.addCheckboxItem();
     setCheckboxItem(question, title, steps);
   } else {
-    if (steps.length) {
+    if (steps && steps.length) {
       var question = questions[q].asCheckboxItem();
       setCheckboxItem(question, title, steps);
     } else if (q >= 0) {
       questions[q].asCheckboxItem().setChoices([questions[q].asCheckboxItem().createChoice('None')]);
+      questions[q].asCheckboxItem().setRequired(false);
+      questions[q].asCheckboxItem().setValidation(null);
     }
   }
 }
@@ -344,7 +312,12 @@ function setCheckboxItem(question, title, steps) {
   for (x in steps) {
     // step formValues are either quantities or instructions
     if (steps[x].amount > 0) {
-      choices.push(question.createChoice(Utilities.formatString('%01.3f %s %s', steps[x].amount, steps[x].uom, steps[x].ingredient)));
+      // If the number is an integer, then change the format string
+      if (Number.isInteger(steps[x].amount)) {
+        choices.push(question.createChoice(Utilities.formatString('%0d %s %s', steps[x].amount, steps[x].uom, steps[x].ingredient)));
+      } else {
+        choices.push(question.createChoice(Utilities.formatString('%01.3f %s %s', steps[x].amount, steps[x].uom, steps[x].ingredient)));
+      }
     } else {
       choices.push(question.createChoice(steps[x].ingredient));
     }
@@ -355,6 +328,63 @@ function setCheckboxItem(question, title, steps) {
     .requireSelectExactly(steps.length)
     .build();
   question.setValidation(validation);
+}
+
+function testBuildSpecialsForms() {
+  var recipes = new CBatchRecipes().list;
+  var specials = getSpecials();
+  buildSpecialsForms(specials, recipes)
+}
+
+function buildSpecialsForms(specials, recipes) {
+  specials.forEach(s => {
+    if (s.enabled) {
+      var recipe = recipes.filter(r => r.name === s.name);
+      if (recipe) {
+        var data = { 
+          'title': s.name
+        };
+        recipe.forEach(item => {
+          if (item.step == 1) {
+            if (!data.hasOwnProperty('step1')) {
+              data.step1 = [];
+            }
+            data.step1.push(item);
+          } else if (item.step == 2) {
+            if (!data.hasOwnProperty('step2')) {
+              data.step2 = [];
+            }
+            data.step2.push(item);
+          } else if (item.step == 3) {
+            if (!data.hasOwnProperty('step3')) {
+              data.step3 = [];
+            }
+            data.step3.push(item);
+          } else if (item.step == 4) {
+            if (!data.hasOwnProperty('step4')) {
+              data.step4 = [];
+            }
+            data.step4.push(item);
+          } else if (item.step == 5) {
+            if (!data.hasOwnProperty('step5')) {
+              data.step5 = [];
+            }
+            data.step5.push(item);
+          } else if (item.step == 6) {
+            if (!data.hasOwnProperty('step6')) {
+              data.step6 = [];
+            }
+            data.step6.push(item);
+          }
+        });
+      }
+      if (s.formName.indexOf(DriveName.SpecialCookieOne) === 0) {
+        updateSpecialCookie(getDrive(DriveName.SpecialCookieOne), data);
+      } else if (s.formName.indexOf(DriveName.SpecialCookieTwo) === 0) {
+        updateSpecialCookie(getDrive(DriveName.SpecialCookieTwo), data);
+      }
+    }
+  });
 }
 
 function updateSpecialCookie(formId, data) {
@@ -370,6 +400,8 @@ function updateSpecialCookie(formId, data) {
   setQuestion(form, questions, 'Step 2', data.step2);
   setQuestion(form, questions, 'Step 3', data.step3);
   setQuestion(form, questions, 'Step 4', data.step4);
+  setQuestion(form, questions, 'Step 5', data.step5);
+  setQuestion(form, questions, 'Step 6', data.step6);
 }
 
 function testUpdateCookieCounter() {
@@ -436,7 +468,7 @@ function updateLocationsAndEmployees(formId, users, locations) {
         var question = questions[index].asListItem();
         var employees = [];
         for (var value in users) {
-          if (value > 0 && users[value]) {
+          if (users[value]) {
             employees.push(question.createChoice(users[value].name));
           }
         }
@@ -464,13 +496,6 @@ function sendNotification(subject, body, type) {
       }
     }
   });
-  for (index in recipients) {
-    if (index > 0 && recipients[index][1]) {
-      if ((recipients[index][3] == true && type == NotificationType.Batch) || (recipients[index][4] == true && type == NotificationType.Inventory)) {
-        MailApp.sendEmail(recipients[index][1], subject, body);
-      }
-    }
-  }
 }
 
 function formSubmitted(e) {
