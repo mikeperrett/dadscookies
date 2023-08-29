@@ -108,6 +108,15 @@ function editFlavor(e) {
         }
       });
       recipes.save();
+      var frozen = new CFrozen();
+      frozen.list.forEach(x => {
+        if (x.name === e.oldValue) {
+          x.name = e.value;
+          Logger.log(`CFrozen.Updated ${x.name}`);
+          frozen.update(x);
+        }
+      });
+      frozen.save();
       var batches = new CBatches();
       batches.list.forEach(x => {
         if (x.name === e.oldValue) {
