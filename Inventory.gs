@@ -218,19 +218,6 @@ function onReceivedShipment(e) {
   }
 }
 
-function sendInventoryReceivedEmail(location, received, employee) {
-  var subject = 'Shipment Recieved at ' + location + '\n\n';
-  var date = new Date();
-  var body = 'Submitted: ' + date.toLocaleString() + '\n';
-  body += 'Location: ' + location + '\n';
-  body += 'Employee: ' + employee + '\n';
-  body += 'Items Received: \n';
-  for (item in received) {
-    body += Utilities.formatString('%d %s "%s"\n', received[item][1], received[item][2], received[item][0]);
-  }
-  sendNotification(subject, body, NotificationType.Inventory);
-}
-
 function processShippingInput(received, formValues, ordinal, location) {
   var value = formValues['Enter Amount Received (' + ordinal + ')'][0];
   if (value > 0) {
