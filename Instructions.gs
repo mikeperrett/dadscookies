@@ -46,7 +46,7 @@ function buildInstructionsDoc() {
   addHeader(body, styles, 'Batch Mix Instructions');
   flavors.forEach(flavor => {
     if (flavor.enabled) {
-      styles.linkStyle[DocumentApp.Attribute.LINK_URL] = flavor.form;
+      styles.linkStyle[DocumentApp.Attribute.LINK_URL] = `${formsRoot}${flavor.formId}/viewform`;
       par = body.appendParagraph(flavor.name);
       par.setAttributes(styles.linkStyle);
       par.setLineSpacing(2);
@@ -64,7 +64,7 @@ function buildInstructionsDoc() {
   // Build the daily batch doc
   addHeader(batchBody, styles, 'Daily Batch Progress');
 
-  var progress = new CBatches().list; // Stock.getRange('Batches').getValues();
+  var progress = new CBatches().list;
   var tableData = [];
   tableData.push(['Name', 'Location', 'Completed', 'Goal']);
   progress.forEach(p => {

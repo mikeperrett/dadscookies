@@ -2,7 +2,7 @@ class Flavor {
   constructor(id, data) {
     this.id = id;
     this.name = data[0];
-    this.form = data[1];
+    this.formId = data[1];
     this.enabled = Boolean(data[2]);
     this.special = Boolean(data[3]);
     this.formName = data[4];
@@ -22,7 +22,7 @@ class CFlavors {
     }
     this.update = function(data) {
       if (data.id >= 0) {
-        this.values[data.id] = [data.name, data.form, data.enabled, data.special, data.formName, data.yeild];
+        this.values[data.id] = [data.name, data.formId, data.enabled, data.special, data.formName, data.yeild];
       }
     }
     this.save = function() {

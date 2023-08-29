@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 30;
+const current = 31;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -132,6 +132,47 @@ function doGet() {
   // return HtmlService.createHtmlOutput('<h1>Hello There</h1');
   return ContentService.createTextOutput(`Released ${released}, Current: ${current}(${beta ? 'Beta' : 'Released'})`);
 //   return HtmlService.createHtmlOutputFromFile('index');
+}
+
+function onEditFlavorName(e) {
+  const column = e.range.getColumn();
+  const sheet = e.range.getSheet().getName();
+  if (sheet === Sheet.Lists && column === 2) {
+    if (e.oldValue === undefined) {
+      Logger.log('New Flavor was created: ' + e.value);
+    } else if (e.value === undefined) {
+      Logger.log('Flavor was deleted: ' + e.oldValue);
+    } else {
+      Logger.log(`Update old flavor from "${e.oldValue}" to "${e.value}"`);
+      var flavors = new CFlavors();
+      flavors.list.forEach(x => {
+        if (x.name === e.oldValue) {
+          x.name = e.value;
+          Logger.log(`CFlavors.Updated ${x.name}`);
+          flavors.update(x);
+        }
+      });
+      flavors.save();
+      var recipes = new CBatchRecipes();
+      recipes.list.forEach(x => {
+        if (x.name === e.oldValue) {
+          x.name = e.value;
+          Logger.log(`CBatchRecipes.Updated ${x.name}`);
+          recipes.update(x);
+        }
+      });
+      recipes.save();
+      var batches = new CBatches();
+      batches.list.forEach(x => {
+        if (x.name === e.oldValue) {
+          x.name = e.value;
+          Logger.log(`CBatches.Updated ${x.name}`);
+          batches.update(x);
+        }
+      });
+      batches.save();
+    }
+  }
 }
 
 function getBatches() {
