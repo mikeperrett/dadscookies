@@ -10,10 +10,6 @@ function onEditWorkbook(e) {
   }
 }
 
-function editUser(e) {
-
-}
-
 function editIngredient(e) {
  if (e.oldValue === undefined) {
       Logger.log('New Ingredient was created: ' + e.value);
