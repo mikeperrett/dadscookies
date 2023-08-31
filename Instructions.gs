@@ -28,8 +28,8 @@ function addLink(body, styles, text, url) {
 function buildInstructionsDoc() {
   const docsRoot = 'https://docs.google.com/document/d/';
   const formsRoot = 'https://docs.google.com/forms/d/e/'; // ${id}/viewform?usp=sf_link';
-  const flavors = new CFlavors().list;
-  const stock = new CStock().list;
+  const flavors = new CFlavors().list.sort((a,b) => (a.name > b.name) ? 1 : (b.name > a.name) ? -1 : 0);
+  const stock = new CStock().list.sort((a,b) => (a.name > b.name) ? 1 : (b.anme > a.name) ? -1 : 0);
   const locations = getLocations();
 
   var styles = {
@@ -82,7 +82,7 @@ function buildInstructionsDoc() {
   // Build the daily batch doc
   const frozenBody = DocumentApp.openById(getDrive(DriveName.FrozenInventory)).getBody();
   buildTitle(frozenBody, styles);
-  const frozen = new CFrozen().list;
+  const frozen = new CFrozen().list.sort((a,b) => (a.name < b.name) ? 1 : (b.name > a.name) ? -1 : 0);
   locations.forEach(l => {
     var location = {'location': l, 'data': []};
     location.data.push(['Flavor', 'Count']);
