@@ -57,6 +57,7 @@ function buildInstructionsDoc() {
   addLink(body, styles, 'Daily Batch Progress', `${docsRoot}${getDrive(DriveName.DailyBatchProgress)}`);
   addLink(body, styles, 'Frozen Inventory', `${docsRoot}${getDrive(DriveName.FrozenInventory)}`);
   addLink(body, styles, 'Raw Inventory', `${docsRoot}${getDrive(DriveName.RawInventory)}`);
+  addLink(body, styles, 'Batch Production History', `${docsRoot}${getDrive(DriveName.BatchHistoryDoc)}`);
 
   const batchBody = DocumentApp.openById(getDrive(DriveName.DailyBatchProgress)).getBody();
   buildTitle(batchBody, styles);
