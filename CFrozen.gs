@@ -10,7 +10,9 @@ class FrozenItem {
 
 class CFrozen {
  constructor() {
-    this.range = getRange(Sheet.Frozen);
+    this.added = [];
+    this.sheet = getSheet(Sheet.Frozen);
+    this.range = this.sheet.getDataRange();
     this.values = this.range.getValues();
     this.list = [];
     for (var x in this.values) {
@@ -20,8 +22,15 @@ class CFrozen {
     }
     this.update = function(data) {
       if (data.id >= 0) {
-        this.values[data.id] = [data.name, data.count, data.location, data.actual];
+        this.values[data.id] = [data.name, data.count, data.location];
       }
+    }
+    this.add = function(data) {
+      const id = Math.max(...this.list.map(x => x.id)) + 1;
+      const item = new FrozenItem(id, data);
+      Logger.log(item);
+      this.list.push(item);
+      this.added.push([item.name, item.count, item.location]);
     }
     this.save = function() {
       this.range.setValues(this.values);

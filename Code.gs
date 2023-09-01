@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 33;
+const current = 35;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -134,6 +134,11 @@ function doGet() {
 //   return HtmlService.createHtmlOutputFromFile('index');
 }
 
+function testGetLocations() {
+  const locations = getLocations();
+  locations.forEach(l => Logger.log(l));
+}
+
 function getLocations() {
   var lists = getRange(Sheet.Lists).getValues();
   var locations = [];
@@ -142,7 +147,7 @@ function getLocations() {
       locations.push(l[0]);
     }
   });
-  return locations;
+  return locations.sort((a,b) => (a > b) ? 1 : (b > a) ? -1 : 0);
 }
 
 function getSpecials() {

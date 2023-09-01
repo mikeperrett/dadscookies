@@ -200,7 +200,6 @@ function createStockItems(driveType, stock, location) {
       stock.added.forEach(a => stock.sheet.appendRow(a));
     }
   }
-
 }
 
 function onReceivedShipment(e) {
@@ -229,39 +228,6 @@ function processShippingInput(received, formValues, ordinal, location) {
         location
       ]);
   }
-}
-
-function updateFrozenInventory(e) {
-  var frozen = new CFrozen();
-  var inventory = frozen.list;
-  var formValues = e.namedValues;
-  var count = 0;
-  var flavor = '';
-  var location = formValues['Where are you working today?'][0];
-  var special1 = formValues['Special Cookie One'][0];
-  var special2 = formValues['Special Cookie Two'][0];
-  var specialCount1 = formValues['Special Cookie One Quantity'][0];
-  var specialCount2 = formValues['Special Cookie Two Quantity'][0];
-  Logger.log('Updating frozen inventory for ' + location);
-  for(var key in formValues) {    
-    flavor = key;
-    count = formValues[key];
-    inventory.forEach(item => {
-      if (item.name.indexOf(flavor) == 0 && item.location == location) {
-        // Logger.log('Item: ' + item.name + ', Flavor: ' + flavor + ', Count: ' + count + ', Location: ' + item.location);
-        item.count = count;
-        frozen.update(item);
-      } else if (special1 && item.name.indexOf(special1) == 0 && item.location == location) {
-        item.count = specialCount1;
-        frozen.update(item);
-      } else if (special2 && item.name.indexOf(special2) == 0 && item.location == location) {
-        item.count = specialCount2;
-        frozen.update(item);
-      }
-    });
-  }
-  frozen.save();
-  buildInstructionsDoc();
 }
 
 function sendIngredientsInventory() {
