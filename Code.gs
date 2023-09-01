@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 35;
+const current = 37;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -31,7 +31,8 @@ const Sheet = {
   Frozen: 'FrozenInventory',
   Lists: 'Lists',
   Flavors: 'Flavors',
-  Users: 'Users'
+  Users: 'Users',
+  History: 'History'
 }
 
 const DriveName = {

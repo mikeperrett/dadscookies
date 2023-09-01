@@ -1,5 +1,5 @@
 function testUpdateBatch() {
-  var batch = updateBatch(Form.ClassicChocolateChip, 'Fresno');
+  var batch = updateBatch('SpecialCookieTwoDev', 'Lemoore');
   Logger.log(batch);
 }
 
@@ -13,22 +13,34 @@ function resetDailyBatchProgress() {
   buildInstructionsDoc();
 }
 
-function updateBatch(flavor, location) {
+function updateBatch(formName, location) {
   const flavors = new CFlavors();
+  const batches = new CBatches();
   var batch = {};
-  flavors.list.forEach(f => {
-    if (f.formName == flavor) {
-      const batches = new CBatches();
-      batches.list.forEach(b => {
-        if (b.location == location && b.name == f.name) {
-          b.completed++;
-          batch = b;
-          batches.update(b);
-          batches.save();
-        }
-      })
+  var flavor = flavors.list.find(x => x.formName == formName);
+  if (flavor) {
+    var batch = batches.list.find(b => b.name === flavor.name && b.location === location);
+    if (batch) {
+      batch.completed++;
+      batches.update(batch);
+      upsertBatchHistory(batch, flavor.yield, location);
     }
-  });
-  buildInstructionsDoc();
+    batches.save();
+    buildInstructionsDoc();
+  }
   return batch;
+}
+
+function upsertBatchHistory(batch, yeild, location) {
+  const history = new CHistory();
+  var date = new Date().toLocaleDateString('en-us');
+  var row = history.list.find(x => x.date == date && x.flavor == batch.name && x.location == location);
+  if (row) {
+    row.completed = batch.completed;
+    history.update(row);
+  } else {
+    history.add([date, batch.name, location, batch.completed, yeild, batch.completed * yeild]);
+  }
+  history.save();
+  history.added.forEach(a => history.sheet.appendRow(a));
 }

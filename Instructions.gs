@@ -82,7 +82,7 @@ function buildInstructionsDoc() {
   // Build the daily batch doc
   const frozenBody = DocumentApp.openById(getDrive(DriveName.FrozenInventory)).getBody();
   buildTitle(frozenBody, styles);
-  const frozen = new CFrozen().list.sort((a,b) => (a.name < b.name) ? 1 : (b.name > a.name) ? -1 : 0);
+  const frozen = new CFrozen().list.sort((a,b) => (a.name > b.name) ? 1 : (b.name > a.name) ? -1 : 0);
   locations.forEach(l => {
     var location = {'location': l, 'data': []};
     location.data.push(['Flavor', 'Count']);
