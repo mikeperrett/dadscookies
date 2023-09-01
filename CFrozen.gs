@@ -28,7 +28,6 @@ class CFrozen {
     this.add = function(data) {
       const id = Math.max(...this.list.map(x => x.id)) + 1;
       const item = new FrozenItem(id, data);
-      Logger.log(item);
       this.list.push(item);
       this.added.push([item.name, item.count, item.location]);
     }
