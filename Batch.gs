@@ -31,15 +31,17 @@ function updateBatch(formName, location) {
   return batch;
 }
 
-function upsertBatchHistory(batch, yeild, location) {
+function upsertBatchHistory(batch, yield, location) {
   const history = new CHistory();
   var date = new Date().toLocaleDateString('en-us');
   var row = history.list.find(x => x.date == date && x.flavor == batch.name && x.location == location);
   if (row) {
     row.completed = batch.completed;
+    row.yield = yield;
+    row.total = batch.completed * yield;
     history.update(row);
   } else {
-    history.add([date, batch.name, location, batch.completed, yeild, batch.completed * yeild]);
+    history.add([date, batch.name, location, batch.completed, yield, batch.completed * yield]);
   }
   history.save();
   history.added.forEach(a => history.sheet.appendRow(a));
