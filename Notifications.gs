@@ -1,3 +1,7 @@
+function testSendNotification() {
+  sendNotification('Some subject', 'message Body', NotificationType.Batch);
+}
+
 // type = 'batch' or 'inventory'
 function sendNotification(subject, body, type) {  
   var recipients = new CUsers().list; 

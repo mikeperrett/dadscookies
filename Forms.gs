@@ -289,10 +289,6 @@ function updateLocationsAndEmployees(formId, users, locations) {
   }
 }
 
-function testSendNotification() {
-  sendNotification('Some subject', 'message Body', NotificationType.Batch);
-}
-
 function formSubmitted(e) {
   var sheet = SpreadsheetApp.getActive().getName(); 
   var values = e.values;
