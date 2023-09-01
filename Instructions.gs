@@ -57,6 +57,7 @@ function buildInstructionsDoc() {
   addLink(body, styles, 'Daily Batch Progress', `${docsRoot}${getDrive(DriveName.DailyBatchProgress)}`);
   addLink(body, styles, 'Frozen Inventory', `${docsRoot}${getDrive(DriveName.FrozenInventory)}`);
   addLink(body, styles, 'Raw Inventory', `${docsRoot}${getDrive(DriveName.RawInventory)}`);
+  addLink(body, styles, 'Batch Production History', `${docsRoot}${getDrive(DriveName.BatchHistoryDoc)}`);
 
   const batchBody = DocumentApp.openById(getDrive(DriveName.DailyBatchProgress)).getBody();
   buildTitle(batchBody, styles);
@@ -126,8 +127,28 @@ function buildInstructionsDoc() {
     table.setColumnWidth(0, 300);
   });
 
-  addHeader(body, styles, 'Inventory Input Forms');
+    // Build the raw inventory page
+  const historyBody = DocumentApp.openById(getDrive(DriveName.BatchHistoryDoc)).getBody();
+  buildTitle(historyBody, styles);
+  const histories = new CHistory().list;
+  locations.forEach(l => {
+    var location = {'location': l, 'data': []};
+    location.data.push(['Date', 'Flavor', 'Batches', 'Total Yield']);
+    histories.forEach(h => {
+      if (h.location === l) {
+        location.data.push([h.date, h.flavor, h.completed, h.total]);
+      }
+    });
+    par = historyBody.appendParagraph(`Batch History for (${l})`);
+    par.setAttributes(styles.headerStyle);
+    par.setLineSpacing(1.5); 
 
+    const table = historyBody.appendTable(location.data);
+    table.setAttributes(styles.tableStyle);
+    table.setColumnWidth(1, 300);
+  });
+
+  addHeader(body, styles, 'Inventory Input Forms');
   par = body.appendParagraph('Frozen Cookie Count Inventory Form');
   styles.linkStyle[DocumentApp.Attribute.LINK_URL] = `${formsRoot}${getDrive(DriveName.CookieCounterClient)}/viewform`;
   par.setAttributes(styles.linkStyle)

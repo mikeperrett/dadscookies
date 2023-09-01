@@ -1,5 +1,5 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 37;
+const current = 39;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -60,6 +60,7 @@ const DriveName = {
   ManualInventory: 'ManualInventory',
   ManualInventoryForm: 'ManualInventoryForm',
   ManualInventoryFormClient: 'ManualInventoryFormClient',
+  BatchHistoryDoc: 'BatchHistoryDoc',
 }
 
 function getDrive(name) {
@@ -90,6 +91,7 @@ function getDrive(name) {
       case DriveName.ManualInventory: return 'https://docs.google.com/spreadsheets/d/1wIOjXWdxDPFQaK8cAA0mRFOl1jIXLJdQTWiowvJBDwA';
       case DriveName.ManualInventoryForm: return '1LilmK5Vxgm5ZF2ELPNNL8a3xGNuPV7sHpomleCsWTrU';
       case DriveName.ManualInventoryFormClient: return '1FAIpQLSc8xGAKIJjR-eGqzKBxAYrnxlCpvGJDvdclZhdXgQ9hNVul0Q';
+      case DriveName.BatchHistoryDoc: return '16lVJkWhvKb8Byb6c-hLxYuP7mNvF9sg0NGi1s1Fmfj0';
     }
   } else {
     // Production documents
@@ -118,6 +120,7 @@ function getDrive(name) {
       case DriveName.ManualInventory: return 'https://docs.google.com/spreadsheets/d/1JTBV5dN-WeNPCH3MsjXHZDR0jG58yVoOoPZOcHLlCUQ';
       case DriveName.ManualInventoryForm: return '14QDyafFw_R99wfhLiMUNcP_JAv_gBHk3qEVxjrgj_ic';
       case DriveName.ManualInventoryFormClient: return '1FAIpQLSdzVFEH7dscHA-7AFrKcqBHGUyUgXU98_vvHHQTNwe2DJSOAA';
+      case DriveName.BatchHistoryDoc: return '1jYKF6rFgmsy2I_8keJ2H3ECR1b6u5Kb_Z7o2BYNDONM';
     }
   }
 }
