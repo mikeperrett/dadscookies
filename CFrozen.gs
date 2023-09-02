@@ -4,7 +4,6 @@ class FrozenItem {
     this.name = data[0];
     this.count = Number(data[1] ?? 0).toFixed(0);
     this.location = data[2];
-    this.actual = Number(data[3] ?? 0).toFixed(0);
   }
 }
 

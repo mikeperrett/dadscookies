@@ -25,6 +25,45 @@ function addLink(body, styles, text, url) {
 
 }
 
+function addHistory(body, styles, flavors, histories, location, startDate, ordinal) {
+  var data = {'location': location, 'rows': []};
+  data.rows.push(['Flavor', 'Total Yield']);
+  const month = new Date(startDate).getMonth();
+  var day = 31;
+  if (month == 0 || month == 9) {
+    day = 31;
+  } else if (month == 3 || month == 6) {
+    day = 30
+  }
+  const year = new Date(startDate).getFullYear();
+  const endDate = new Date(`${month + 3}/${day}/${year}`);
+  const quarterRows = histories.filter(h => 
+    new Date(h.date) >= new Date(startDate)
+    && new Date(h.date) <= new Date(endDate)
+    && h.location === location
+  );
+  if (quarterRows.length) {
+    flavors.forEach(f => {
+      const filtered = quarterRows.filter(x => x.flavor == f.name);
+      if (filtered.length) {
+        const sum = filtered
+          .map(x => x.total)
+          .reduce((a,b) => Number(a) + Number(b));
+        if (sum) {
+          data.rows.push([f.name, Number(sum).toFixed(0)]);
+        }
+      }
+    });
+  }
+  var par = body.appendParagraph(`${location} ${ordinal} Quarter Batches (${new Date(startDate).toLocaleDateString('en-us')} to ${new Date(endDate).toLocaleDateString('en-us')})`);
+  par.setAttributes(styles.headerStyle);
+  par.setLineSpacing(1.5); 
+
+  const table = body.appendTable(data.rows);
+  table.setAttributes(styles.tableStyle);
+  table.setColumnWidth(0, 300);
+}
+
 function buildInstructionsDoc() {
   const docsRoot = 'https://docs.google.com/document/d/';
   const formsRoot = 'https://docs.google.com/forms/d/e/'; // ${id}/viewform?usp=sf_link';
@@ -127,25 +166,47 @@ function buildInstructionsDoc() {
     table.setColumnWidth(0, 300);
   });
 
-    // Build the raw inventory page
+  // Build the batch history page
   const historyBody = DocumentApp.openById(getDrive(DriveName.BatchHistoryDoc)).getBody();
   buildTitle(historyBody, styles);
   const histories = new CHistory().list;
+  var date = new Date();
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth();
   locations.forEach(l => {
-    var location = {'location': l, 'data': []};
+    // CURRENT MONTH DATA
+    const location = {'location': l, 'data': []};
     location.data.push(['Date', 'Flavor', 'Batches', 'Total Yield']);
-    histories.forEach(h => {
-      if (h.location === l) {
-        location.data.push([h.date, h.flavor, h.completed, h.total]);
-      }
+    var currentMonth = histories.filter(h => 
+      new Date(h.date).getMonth() == month 
+      && new Date(h.date).getFullYear() == year 
+      && h.location === l
+    );
+    currentMonth.forEach(h => {
+      location.data.push([h.date, h.flavor, h.completed, h.total]);
     });
-    par = historyBody.appendParagraph(`Batch History for (${l})`);
+    par = historyBody.appendParagraph(`${l} Current Month Batches`);
     par.setAttributes(styles.headerStyle);
     par.setLineSpacing(1.5); 
 
     const table = historyBody.appendTable(location.data);
     table.setAttributes(styles.tableStyle);
     table.setColumnWidth(1, 300);
+
+    // PREVIOUS YEAR DATA
+    const firstQuarter = `1/1/${month > 3 ? year : year - 1 }`;
+    const secondQuarter = `4/1/${month > 6 ? year : year - 1 }`;
+    const thirdQuarter = `7/1/${month > 9 ? year : year - 1 }`;
+    const fourthQuarter = `10/1/${month >= 12 ? year : year - 1 }`;
+    const newYear = `12/31/${year}`;
+
+    addHistory(historyBody, styles, flavors, histories, l, firstQuarter, '1st');
+    addHistory(historyBody, styles, flavors, histories, l, secondQuarter, '2nd');
+    addHistory(historyBody, styles, flavors, histories, l, thirdQuarter, '3rd');
+    addHistory(historyBody, styles, flavors, histories, l, fourthQuarter, '4th');
+    
+    historyBody.appendPageBreak();
   });
 
   addHeader(body, styles, 'Inventory Input Forms');
