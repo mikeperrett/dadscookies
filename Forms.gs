@@ -32,7 +32,6 @@ function updateManualInventoryForm() {
     .setConfirmationMessage('Thanks for your help in keeping our inventory current!')
     .setAllowResponseEdits(false)
     .setAcceptingResponses(true);
-  form.setShowLinkToRespondAgain(false);
 
   for(index = 0; index < ingredients.length; index++) {
     const i = ingredients[index];
@@ -74,19 +73,19 @@ function updateAllForms() {
   Logger.log('Updating all forms from data source');
   var users = (new CUsers(Sheet.Users).list).sort((x, y) => x - y );
   const locations = getLocations();
-  updateLocationsAndEmployees(getDrive(DriveName.ClassicChocolateChip), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.CookiesNCream), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.CakeBatter), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.Snickerdoodle), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.PeanutButterChocolateChip), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.ChocolatePeanutButterChip), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.OatmealChocolateChip), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.OatmealRaisin), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.CookieCounter), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.SpecialCookieOne), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.SpecialCookieTwo), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.ShipmentReceivedMobile), users, locations);
-  updateLocationsAndEmployees(getDrive(DriveName.ManualInventoryForm), users, locations);
+  updateLocationsAndEmployees(getDrive(DriveName.ClassicChocolateChip), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.CookiesNCream), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.CakeBatter), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.Snickerdoodle), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.PeanutButterChocolateChip), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.ChocolatePeanutButterChip), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.OatmealChocolateChip), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.OatmealRaisin), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.CookieCounter), users, locations, true);
+  updateLocationsAndEmployees(getDrive(DriveName.SpecialCookieOne), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.SpecialCookieTwo), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.ShipmentReceivedMobile), users, locations, true);
+  updateLocationsAndEmployees(getDrive(DriveName.ManualInventoryForm), users, locations, true);
   
   var recipes = new CBatchRecipes().list;
   var specials = getSpecials();
@@ -205,7 +204,6 @@ function updateSpecialCookie(formId, data) {
     .setConfirmationMessage('Thanks for your help in making a successful batch!')
     .setAllowResponseEdits(false)
     .setAcceptingResponses(true);
-  form.setShowLinkToRespondAgain(false);
   var questions = form.getItems();
   setQuestion(form, questions, 'Step 1', data.step1);
   setQuestion(form, questions, 'Step 2', data.step2);
@@ -259,9 +257,9 @@ function updateCookieCounter(flavors) {
 }
 
 // Update locations and employees list in all forms
-function updateLocationsAndEmployees(formId, users, locations) {
+function updateLocationsAndEmployees(formId, users, locations, respondAgain) {
   var form = FormApp.openById(formId);
-  form.setShowLinkToRespondAgain(false);
+  form.setShowLinkToRespondAgain(respondAgain);
   // Update some formValues from the ss
   var questions = form.getItems();
 
