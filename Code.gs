@@ -133,11 +133,11 @@ function getDrive(name) {
       case DriveName.ManualInventoryForm: return '14QDyafFw_R99wfhLiMUNcP_JAv_gBHk3qEVxjrgj_ic';
       case DriveName.ManualInventoryFormClient: return '1FAIpQLSdzVFEH7dscHA-7AFrKcqBHGUyUgXU98_vvHHQTNwe2DJSOAA';
       case DriveName.BatchHistoryDoc: return '1jYKF6rFgmsy2I_8keJ2H3ECR1b6u5Kb_Z7o2BYNDONM';
-      case DriveName.BatchHistoryDetail0Doc: return '1enpaNyTM2fsTmNIH7P12-CeI0EWEloNmVDkVM_PXOWI';
-      case DriveName.BatchHistoryDetail1Doc: return '';
-      case DriveName.BatchHistoryDetail2Doc: return '';
-      case DriveName.BatchHistoryDetail3Doc: return '';
-      case DriveName.BatchHistoryDetail4Doc: return '';
+      case DriveName.BatchHistoryDetail0Doc: return '163Uf_HCztsnBDMZnzZBg1QAz9UXWvp2lL0vWmbrEBzc';
+      case DriveName.BatchHistoryDetail1Doc: return '1KokvmAk22O7LfqNqOggk-GVuP51IT4dgvht-0ZRSJso';
+      case DriveName.BatchHistoryDetail2Doc: return '12kIxQ591G8l8fMxzv51MbVmEvh9HvEjY2CR81R7bSGY';
+      case DriveName.BatchHistoryDetail3Doc: return '1Txck9Vm6SxTeIfCn4G7ob24cmrOwU4YDTRtinaUzYe8';
+      case DriveName.BatchHistoryDetail4Doc: return '1wsHo53-kFyYA-8z5hUNYLu1kjAsSXPPAMN7wlwyUMQY';
     }
   }
 }
