@@ -1,8 +1,10 @@
 const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 42;
+const current = 43;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
+const docsRoot = 'https://docs.google.com/document/d/';
+const formsRoot = 'https://docs.google.com/forms/d/e/';
 
 const UnitOfMeasure = {
   Kilogram: 'kg',
@@ -61,6 +63,11 @@ const DriveName = {
   ManualInventoryForm: 'ManualInventoryForm',
   ManualInventoryFormClient: 'ManualInventoryFormClient',
   BatchHistoryDoc: 'BatchHistoryDoc',
+  BatchHistoryDetail0Doc: 'BatchHistoryDetail-0-Doc',
+  BatchHistoryDetail1Doc: 'BatchHistoryDetail-1-Doc',
+  BatchHistoryDetail2Doc: 'BatchHistoryDetail-2-Doc',
+  BatchHistoryDetail3Doc: 'BatchHistoryDetail-3-Doc',
+  BatchHistoryDetail4Doc: 'BatchHistoryDetail-4-Doc',
 }
 
 function getDrive(name) {
@@ -92,6 +99,11 @@ function getDrive(name) {
       case DriveName.ManualInventoryForm: return '1LilmK5Vxgm5ZF2ELPNNL8a3xGNuPV7sHpomleCsWTrU';
       case DriveName.ManualInventoryFormClient: return '1FAIpQLSc8xGAKIJjR-eGqzKBxAYrnxlCpvGJDvdclZhdXgQ9hNVul0Q';
       case DriveName.BatchHistoryDoc: return '16lVJkWhvKb8Byb6c-hLxYuP7mNvF9sg0NGi1s1Fmfj0';
+      case DriveName.BatchHistoryDetail0Doc: return '1enpaNyTM2fsTmNIH7P12-CeI0EWEloNmVDkVM_PXOWI';
+      case DriveName.BatchHistoryDetail1Doc: return '18q2EumyziTVEqE9_CO1Trq_DvEQkxTqe8AKDcQR0vBE';
+      case DriveName.BatchHistoryDetail2Doc: return '1I1QLwgTaMfabWOPehF1iG2E5UrvVSebw92ShzzRGD6A';
+      case DriveName.BatchHistoryDetail3Doc: return '1KBC5BW8cng7WxLyOTWvjqjpNo3OQefsVjmRXVKWzFlw';
+      case DriveName.BatchHistoryDetail4Doc: return '1MNM3O1kujhjiOreAy1uqHTnp37ANAUIttGuP2xNQY2g';
     }
   } else {
     // Production documents
@@ -121,6 +133,11 @@ function getDrive(name) {
       case DriveName.ManualInventoryForm: return '14QDyafFw_R99wfhLiMUNcP_JAv_gBHk3qEVxjrgj_ic';
       case DriveName.ManualInventoryFormClient: return '1FAIpQLSdzVFEH7dscHA-7AFrKcqBHGUyUgXU98_vvHHQTNwe2DJSOAA';
       case DriveName.BatchHistoryDoc: return '1jYKF6rFgmsy2I_8keJ2H3ECR1b6u5Kb_Z7o2BYNDONM';
+      case DriveName.BatchHistoryDetail0Doc: return '1enpaNyTM2fsTmNIH7P12-CeI0EWEloNmVDkVM_PXOWI';
+      case DriveName.BatchHistoryDetail1Doc: return '';
+      case DriveName.BatchHistoryDetail2Doc: return '';
+      case DriveName.BatchHistoryDetail3Doc: return '';
+      case DriveName.BatchHistoryDetail4Doc: return '';
     }
   }
 }

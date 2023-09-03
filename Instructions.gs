@@ -18,16 +18,16 @@ function addHeader(body, styles, text) {
   par.setLineSpacing(1.5);
 }
 
-function addLink(body, styles, text, url) {
+function addLink(body, styles, text, url, withSpacing) {
   par = body.appendParagraph(text);
   styles.linkStyle[DocumentApp.Attribute.LINK_URL] = url;
   par.setAttributes(styles.linkStyle)
-  par.setLineSpacing(2);
-
+  if (withSpacing) {
+    par.setLineSpacing(2);
+  }
 }
 
-function addHistory(body, styles, flavors, histories, location, startDate, ordinal) {
-  var data = {'location': location, 'rows': []};
+function getHistoryDates(histories, location, startDate) {
   const month = new Date(startDate).getMonth();
   var day = 31;
   if (month == 0 || month == 9) {
@@ -37,15 +37,48 @@ function addHistory(body, styles, flavors, histories, location, startDate, ordin
   }
   const year = new Date(startDate).getFullYear();
   const endDate = new Date(`${month + 3}/${day}/${year}`);
-  const quarterRows = histories.filter(h => 
+  const data = {'endDate': endDate, 'rows': []};
+  data.rows = histories.filter(h => 
     new Date(h.date) >= new Date(startDate)
     && new Date(h.date) <= new Date(endDate)
     && h.location === location
   );
-  if (quarterRows.length) {
-    // data.rows.push([`${location} ${ordinal} Quarter`, `${new Date(startDate).toLocaleDateString('en-us')} to ${new Date(endDate).toLocaleDateString('en-us')}`]);
+  return data;
+}
+
+function addHistoryDetail(docId, styles, histories, location, startDate, ordinal) {
+  const body = DocumentApp.openById(getDrive(docId)).getBody();
+  buildTitle(body, styles);
+  const quarterRows = getHistoryDates(histories, location, startDate);
+  addHeader(body, styles, `${location} Daily Counts: ${new Date(startDate).toLocaleDateString('en-us')} to ${new Date(quarterRows.endDate).toLocaleDateString('en-us')}`);
+  if (quarterRows.rows.length) {
+    var data = {'location': location, 'rows': []};
+    quarterRows.rows
+      .sort((a,b) => (a.date > b.date) ? 1 : (b.date > a.date) ? -1 : 0)
+      .forEach(h => data.rows.push([h.date, h.flavor, h.total]));
+    const table = body.appendTable();
+    var tr = table.appendTableRow();
+    tr.setAttributes(styles.tableHeader);
+    tr.appendTableCell('Date');
+    tr.appendTableCell('Flavor');
+    tr.appendTableCell('Total Count');
+    data.rows.forEach(d => {
+      tr = table.appendTableRow();
+      tr.setAttributes(styles.tableStyle);
+      tr.appendTableCell(d[0]);
+      tr.appendTableCell(d[1]);
+      tr.appendTableCell(Number(d[2]).toFixed(0));
+    });
+    table.setColumnWidth(1, 300);
+  }
+}
+
+function addHistory(body, styles, flavors, histories, location, startDate, ordinal, year, detailId) {
+  const quarterRows = getHistoryDates(histories, location, startDate);
+  if (quarterRows.rows.length) {
+    var data = {'location': location, 'rows': []};
     flavors.forEach(f => {
-      const filtered = quarterRows.filter(x => x.flavor == f.name);
+      const filtered = quarterRows.rows.filter(x => x.flavor == f.name);
       if (filtered.length) {
         const sum = filtered
           .map(x => x.total)
@@ -55,11 +88,14 @@ function addHistory(body, styles, flavors, histories, location, startDate, ordin
         }
       }
     });
+    if (detailId) {
+      addLink(body, styles, `Details for ${ordinal} Quarter`, `${docsRoot}${getDrive(detailId)}`, false);
+    }
     const table = body.appendTable();
     var tr = table.appendTableRow();
     tr.setAttributes(ordinal == 'Current' ? styles.tableHeaderCurrent : styles.tableHeader);
     tr.appendTableCell(`${location} ${ordinal} Quarter (${year})`);
-    tr.appendTableCell(`${new Date(startDate).toLocaleDateString('en-us')} to ${new Date(endDate).toLocaleDateString('en-us')}`);
+    tr.appendTableCell(`${new Date(startDate).toLocaleDateString('en-us')} to ${new Date(quarterRows.endDate).toLocaleDateString('en-us')}`);
     data.rows.forEach(d => {
       tr = table.appendTableRow();
       tr.setAttributes(styles.tableStyle);
@@ -70,8 +106,6 @@ function addHistory(body, styles, flavors, histories, location, startDate, ordin
 }
 
 function buildInstructionsDoc() {
-  const docsRoot = 'https://docs.google.com/document/d/';
-  const formsRoot = 'https://docs.google.com/forms/d/e/'; // ${id}/viewform?usp=sf_link';
   const flavors = new CFlavors().list.sort((a,b) => (a.name > b.name) ? 1 : (b.name > a.name) ? -1 : 0);
   const stock = new CStock().list.sort((a,b) => (a.name > b.name) ? 1 : (b.anme > a.name) ? -1 : 0);
   const locations = getLocations();
@@ -99,7 +133,6 @@ function buildInstructionsDoc() {
     },
     'linkStyle': { 
       [DocumentApp.Attribute.BOLD]: true, 
-      [DocumentApp.Attribute.FOREGROUND_COLOR]: '#000000', 
       [DocumentApp.Attribute.FONT_SIZE]: 12 
     },
     'tableHeader': { 
@@ -133,10 +166,10 @@ function buildInstructionsDoc() {
   });
 
   addHeader(body, styles, 'Inventory and Batch Summaries');
-  addLink(body, styles, 'Daily Batch Progress', `${docsRoot}${getDrive(DriveName.DailyBatchProgress)}`);
-  addLink(body, styles, 'Frozen Inventory', `${docsRoot}${getDrive(DriveName.FrozenInventory)}`);
-  addLink(body, styles, 'Raw Inventory', `${docsRoot}${getDrive(DriveName.RawInventory)}`);
-  addLink(body, styles, 'Batch Production History', `${docsRoot}${getDrive(DriveName.BatchHistoryDoc)}`);
+  addLink(body, styles, 'Daily Batch Progress', `${docsRoot}${getDrive(DriveName.DailyBatchProgress)}`, true);
+  addLink(body, styles, 'Frozen Inventory', `${docsRoot}${getDrive(DriveName.FrozenInventory)}`, true);
+  addLink(body, styles, 'Raw Inventory', `${docsRoot}${getDrive(DriveName.RawInventory)}`, true);
+  addLink(body, styles, 'Batch Production History', `${docsRoot}${getDrive(DriveName.BatchHistoryDoc)}`, true);
 
   const batchBody = DocumentApp.openById(getDrive(DriveName.DailyBatchProgress)).getBody();
   buildTitle(batchBody, styles);
@@ -231,11 +264,18 @@ function buildInstructionsDoc() {
     const thirdQuarter = `7/1/${month > 9 ? year : year - 1 }`;
     const fourthQuarter = `10/1/${month >= 12 ? year : year - 1 }`;
 
-    addHistory(historyBody, styles, flavors, histories, l, currentQuarter, 'Current');
-    addHistory(historyBody, styles, flavors, histories, l, firstQuarter, '1st');
-    addHistory(historyBody, styles, flavors, histories, l, secondQuarter, '2nd');
-    addHistory(historyBody, styles, flavors, histories, l, thirdQuarter, '3rd');
-    addHistory(historyBody, styles, flavors, histories, l, fourthQuarter, '4th');
+    addHistory(historyBody, styles, flavors, histories, l, currentQuarter, 'Current', year, l == 'Fresno' ? DriveName.BatchHistoryDetail0Doc : null);
+    addHistory(historyBody, styles, flavors, histories, l, firstQuarter, '1st', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail1Doc : null);
+    addHistory(historyBody, styles, flavors, histories, l, secondQuarter, '2nd', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail2Doc : null);
+    addHistory(historyBody, styles, flavors, histories, l, thirdQuarter, '3rd', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail3Doc : null);
+    addHistory(historyBody, styles, flavors, histories, l, fourthQuarter, '4th', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail4Doc : null);
+    if (l == 'Fresno') {
+      addHistoryDetail(DriveName.BatchHistoryDetail0Doc, styles, histories, l, currentQuarter, 'Current');      
+      addHistoryDetail(DriveName.BatchHistoryDetail1Doc, styles, histories, l, firstQuarter, '1st');      
+      addHistoryDetail(DriveName.BatchHistoryDetail2Doc, styles, histories, l, secondQuarter, '2nd');      
+      addHistoryDetail(DriveName.BatchHistoryDetail3Doc, styles, histories, l, thirdQuarter, '3rd');      
+      addHistoryDetail(DriveName.BatchHistoryDetail4Doc, styles, histories, l, fourthQuarter, '4th');      
+    }
     
     historyBody.appendPageBreak();
 
