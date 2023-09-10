@@ -1,5 +1,11 @@
-const released = PropertiesService.getScriptProperties().getProperty('version');
-const current = 43;
+const Keys = {
+  Version: 'version',
+  LastHistoryDate: 'lastHistoryDate',
+  LastHistoryLocation: 'lastHistoryLocation',
+}
+
+const released = PropertiesService.getScriptProperties().getProperty(Keys.Version);
+const current = 44;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -63,7 +69,7 @@ const DriveName = {
   ManualInventoryForm: 'ManualInventoryForm',
   ManualInventoryFormClient: 'ManualInventoryFormClient',
   BatchHistoryDoc: 'BatchHistoryDoc',
-  BatchHistoryDetail0Doc: 'BatchHistoryDetail-0-Doc',
+  BatchHistoryDetailDoc: 'BatchHistoryDetailDoc',
   BatchHistoryDetail1Doc: 'BatchHistoryDetail-1-Doc',
   BatchHistoryDetail2Doc: 'BatchHistoryDetail-2-Doc',
   BatchHistoryDetail3Doc: 'BatchHistoryDetail-3-Doc',
@@ -99,11 +105,7 @@ function getDrive(name) {
       case DriveName.ManualInventoryForm: return '1LilmK5Vxgm5ZF2ELPNNL8a3xGNuPV7sHpomleCsWTrU';
       case DriveName.ManualInventoryFormClient: return '1FAIpQLSc8xGAKIJjR-eGqzKBxAYrnxlCpvGJDvdclZhdXgQ9hNVul0Q';
       case DriveName.BatchHistoryDoc: return '16lVJkWhvKb8Byb6c-hLxYuP7mNvF9sg0NGi1s1Fmfj0';
-      case DriveName.BatchHistoryDetail0Doc: return '1enpaNyTM2fsTmNIH7P12-CeI0EWEloNmVDkVM_PXOWI';
-      case DriveName.BatchHistoryDetail1Doc: return '18q2EumyziTVEqE9_CO1Trq_DvEQkxTqe8AKDcQR0vBE';
-      case DriveName.BatchHistoryDetail2Doc: return '1I1QLwgTaMfabWOPehF1iG2E5UrvVSebw92ShzzRGD6A';
-      case DriveName.BatchHistoryDetail3Doc: return '1KBC5BW8cng7WxLyOTWvjqjpNo3OQefsVjmRXVKWzFlw';
-      case DriveName.BatchHistoryDetail4Doc: return '1MNM3O1kujhjiOreAy1uqHTnp37ANAUIttGuP2xNQY2g';
+      case DriveName.BatchHistoryDetailDoc: return '1enpaNyTM2fsTmNIH7P12-CeI0EWEloNmVDkVM_PXOWI';
     }
   } else {
     // Production documents
@@ -133,11 +135,7 @@ function getDrive(name) {
       case DriveName.ManualInventoryForm: return '14QDyafFw_R99wfhLiMUNcP_JAv_gBHk3qEVxjrgj_ic';
       case DriveName.ManualInventoryFormClient: return '1FAIpQLSdzVFEH7dscHA-7AFrKcqBHGUyUgXU98_vvHHQTNwe2DJSOAA';
       case DriveName.BatchHistoryDoc: return '1jYKF6rFgmsy2I_8keJ2H3ECR1b6u5Kb_Z7o2BYNDONM';
-      case DriveName.BatchHistoryDetail0Doc: return '163Uf_HCztsnBDMZnzZBg1QAz9UXWvp2lL0vWmbrEBzc';
-      case DriveName.BatchHistoryDetail1Doc: return '1KokvmAk22O7LfqNqOggk-GVuP51IT4dgvht-0ZRSJso';
-      case DriveName.BatchHistoryDetail2Doc: return '12kIxQ591G8l8fMxzv51MbVmEvh9HvEjY2CR81R7bSGY';
-      case DriveName.BatchHistoryDetail3Doc: return '1Txck9Vm6SxTeIfCn4G7ob24cmrOwU4YDTRtinaUzYe8';
-      case DriveName.BatchHistoryDetail4Doc: return '1wsHo53-kFyYA-8z5hUNYLu1kjAsSXPPAMN7wlwyUMQY';
+      case DriveName.BatchHistoryDetailDoc: return '163Uf_HCztsnBDMZnzZBg1QAz9UXWvp2lL0vWmbrEBzc';
     }
   }
 }
@@ -152,7 +150,12 @@ function doGet() {
   // return ContentService.createTextOutput(content);
   // return HtmlService.createHtmlOutput('<h1>Hello There</h1');
   return ContentService.createTextOutput(`Released ${released}, Current: ${current}(${beta ? 'Beta' : 'Released'})`);
-//   return HtmlService.createHtmlOutputFromFile('index');
+}
+
+function getDynamicMenu(menu, documentId) {
+  const email = Session.getActiveUser();
+  Logger.log(email);
+  return new DynamicMenu(menu, documentId, email);
 }
 
 function testGetLocations() {
@@ -173,6 +176,10 @@ function getLocations() {
 
 function getSpecials() {
   return new CFlavors().list.filter(x => x.enabled && x.special);
+}
+
+function getHistory() {
+  return new CHistory().list;
 }
 
 function testGetRange() {
