@@ -1,8 +1,55 @@
-function buildTitle(body, styles) {
+const styles = {
+  'pageTitleStyle': { 
+    [DocumentApp.Attribute.BOLD]: true, 
+    [DocumentApp.Attribute.FOREGROUND_COLOR]: '#0F5180', 
+    [DocumentApp.Attribute.FONT_SIZE]: 22 
+  },
+  'titleStyle': { 
+    [DocumentApp.Attribute.BOLD]: true, 
+    [DocumentApp.Attribute.FOREGROUND_COLOR]: '#000000', 
+    [DocumentApp.Attribute.FONT_SIZE]: 22 
+  },
+  'headerStyle': { 
+    [DocumentApp.Attribute.BOLD]: true, 
+    [DocumentApp.Attribute.FOREGROUND_COLOR]: '#000000', 
+    [DocumentApp.Attribute.FONT_SIZE]: 16 
+  },
+  'textStyle': { 
+    [DocumentApp.Attribute.BOLD]: false, 
+    [DocumentApp.Attribute.FOREGROUND_COLOR]: '#000000', 
+    [DocumentApp.Attribute.FONT_SIZE]: 12 
+  },
+  'linkStyle': { 
+    [DocumentApp.Attribute.BOLD]: true, 
+    [DocumentApp.Attribute.FONT_SIZE]: 12 
+  },
+  'tableHeader': { 
+    [DocumentApp.Attribute.BOLD]: true, 
+    [DocumentApp.Attribute.FOREGROUND_COLOR]: '#0B6FB8', 
+    [DocumentApp.Attribute.FONT_SIZE]: 12 
+  },
+  'tableHeaderCurrent': { 
+    [DocumentApp.Attribute.BOLD]: true, 
+    [DocumentApp.Attribute.FOREGROUND_COLOR]: '#AE1161', 
+    [DocumentApp.Attribute.FONT_SIZE]: 12 
+  },
+  'tableStyle': { 
+    [DocumentApp.Attribute.BOLD]: true, 
+    [DocumentApp.Attribute.FOREGROUND_COLOR]: '#000000', 
+    [DocumentApp.Attribute.FONT_SIZE]: 10 
+  }
+};
+
+function getStyles() {
+  return styles;
+}
+
+function buildTitle(body) {
+  
   body.clear();
 
   var par = body.appendParagraph(beta ? 'Dads Cookies (Beta)' : 'Dads Cookies');
-  par.setAttributes(styles.titleStyle);
+  par.setAttributes(styles.pageTitleStyle);
   par.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
   const date = new Date().toLocaleString();
   par = body.appendParagraph(`${date} - Version ${current}`);
@@ -11,40 +58,83 @@ function buildTitle(body, styles) {
   par.setAlignment(DocumentApp.HorizontalAlignment.CENTER);
 }
 
-function addHeader(body, styles, text) {
+function addHeader(body, text, withSpacing) {
   par = body.appendParagraph(text);
   par.setAttributes(styles.headerStyle);
-  par.setLineSpacing(1.5);
+  if (withSpacing) {
+    par.setLineSpacing(1.5);
+  }
 }
 
-function addLink(body, styles, text, url) {
+function addLink(body, text, url, withSpacing) {
   par = body.appendParagraph(text);
   styles.linkStyle[DocumentApp.Attribute.LINK_URL] = url;
   par.setAttributes(styles.linkStyle)
-  par.setLineSpacing(2);
-
+  if (withSpacing) {
+    par.setLineSpacing(2);
+  }
 }
 
-function addHistory(body, styles, flavors, histories, location, startDate, ordinal) {
-  var data = {'location': location, 'rows': []};
-  data.rows.push(['Flavor', 'Total Yield']);
+function getHistoryDates(histories, location, startDate) {
   const month = new Date(startDate).getMonth();
   var day = 31;
-  if (month == 0 || month == 9) {
+  if (month == 1) {
+    day = 28;
+  } else if ([0, 9].indexOf(month) >= 0) {
     day = 31;
-  } else if (month == 3 || month == 6) {
+  } else if ([3,6].indexOf(month) >= 0) {
     day = 30
   }
   const year = new Date(startDate).getFullYear();
-  const endDate = new Date(`${month + 3}/${day}/${year}`);
-  const quarterRows = histories.filter(h => 
+  var endDate = new Date(`${month + 3}/${day}/${year}`);
+  const data = {'endDate': endDate, 'rows': []};
+  data.rows = histories.filter(h => 
     new Date(h.date) >= new Date(startDate)
     && new Date(h.date) <= new Date(endDate)
     && h.location === location
   );
-  if (quarterRows.length) {
+  return data;
+}
+
+function testAddHistoryDetail() {
+  addHistoryDetail(getDrive(DriveName.BatchHistoryDetail0Doc), getHistory(), 'Fresno', '10/01/2023', 'Current');
+}
+
+function addHistoryDetail(docId, histories, location, startDate) {
+  const body = DocumentApp.openById(docId).getBody();
+  buildTitle(body);
+  addLink(body, 'Back to Production Summary', `${docsRoot}${getDrive(DriveName.BatchHistoryDoc)}`, false);
+  // Logger.log(`Getting history for ${location}, Quarter: ${startDate}`);
+  const quarterRows = getHistoryDates(histories, location, startDate);
+  addHeader(body, `${location} Daily Counts: ${new Date(startDate).toLocaleDateString('en-us')} to ${new Date(quarterRows.endDate).toLocaleDateString('en-us')}`);
+  if (quarterRows.rows.length) {
+    var data = {'location': location, 'rows': []};
+    quarterRows.rows
+      .sort((a,b) => (a.date > b.date) ? 1 : (b.date > a.date) ? -1 : 0)
+      .forEach(h => data.rows.push([h.date, h.flavor, h.total]));
+    const table = body.appendTable();
+    var tr = table.appendTableRow();
+    tr.setAttributes(styles.tableHeader);
+    tr.appendTableCell('Date');
+    tr.appendTableCell('Flavor');
+    tr.appendTableCell('Total Count');
+    data.rows.forEach(d => {
+      tr = table.appendTableRow();
+      tr.setAttributes(styles.tableStyle);
+      tr.appendTableCell(d[0]);
+      tr.appendTableCell(d[1]);
+      tr.appendTableCell(Number(d[2]).toFixed(0));
+    });
+    table.setColumnWidth(1, 300);
+  }
+}
+
+function addHistory(body, flavors, histories, location, startDate, ordinal, year) {
+  const quarterRows = getHistoryDates(histories, location, startDate);
+  if (quarterRows.rows.length) {
+    var data = {'location': location, 'rows': []};
     flavors.forEach(f => {
-      const filtered = quarterRows.filter(x => x.flavor == f.name);
+      const filtered = quarterRows.rows.filter(x => x.flavor == f.name);
       if (filtered.length) {
         const sum = filtered
           .map(x => x.total)
@@ -54,35 +144,28 @@ function addHistory(body, styles, flavors, histories, location, startDate, ordin
         }
       }
     });
+    const table = body.appendTable();
+    var tr = table.appendTableRow();
+    tr.setAttributes(ordinal == 'Current' ? styles.tableHeaderCurrent : styles.tableHeader);
+    tr.appendTableCell(`${location} ${ordinal} Quarter (${year})`);
+    tr.appendTableCell(`${new Date(startDate).toLocaleDateString('en-us')} to ${new Date(quarterRows.endDate).toLocaleDateString('en-us')}`);
+    data.rows.forEach(d => {
+      tr = table.appendTableRow();
+      tr.setAttributes(styles.tableStyle);
+      tr.appendTableCell(d[0]);
+      tr.appendTableCell(d[1]);
+    });
   }
-  var par = body.appendParagraph(`${location} ${ordinal} Quarter Batches (${new Date(startDate).toLocaleDateString('en-us')} to ${new Date(endDate).toLocaleDateString('en-us')})`);
-  par.setAttributes(styles.headerStyle);
-  par.setLineSpacing(1.5); 
-
-  const table = body.appendTable(data.rows);
-  table.setAttributes(styles.tableStyle);
-  table.setColumnWidth(0, 300);
 }
 
 function buildInstructionsDoc() {
-  const docsRoot = 'https://docs.google.com/document/d/';
-  const formsRoot = 'https://docs.google.com/forms/d/e/'; // ${id}/viewform?usp=sf_link';
   const flavors = new CFlavors().list.sort((a,b) => (a.name > b.name) ? 1 : (b.name > a.name) ? -1 : 0);
   const stock = new CStock().list.sort((a,b) => (a.name > b.name) ? 1 : (b.anme > a.name) ? -1 : 0);
   const locations = getLocations();
-
-  var styles = {
-    'titleStyle': { [DocumentApp.Attribute.BOLD]: true, [DocumentApp.Attribute.FONT_SIZE]: 22 },
-    'headerStyle': { [DocumentApp.Attribute.BOLD]: true, [DocumentApp.Attribute.FONT_SIZE]: 16 },
-    'textStyle': { [DocumentApp.Attribute.BOLD]: false, [DocumentApp.Attribute.FONT_SIZE]: 12 },
-    'linkStyle': { [DocumentApp.Attribute.BOLD]: true, [DocumentApp.Attribute.FONT_SIZE]: 12 },
-    'tableStyle': { [DocumentApp.Attribute.BOLD]: true, [DocumentApp.Attribute.FONT_SIZE]: 10 }
-  };
-
   var body = DocumentApp.openById(getDrive(DriveName.Instructions)).getBody();
   buildTitle(body, styles);
 
-  addHeader(body, styles, 'Batch Mix Instructions');
+  addHeader(body, 'Batch Mix Instructions', true);
   flavors.forEach(flavor => {
     if (flavor.enabled) {
       styles.linkStyle[DocumentApp.Attribute.LINK_URL] = `${formsRoot}${flavor.formId}/viewform`;
@@ -92,17 +175,18 @@ function buildInstructionsDoc() {
     }
   });
 
-  addHeader(body, styles, 'Inventory and Batch Summaries');
-  addLink(body, styles, 'Daily Batch Progress', `${docsRoot}${getDrive(DriveName.DailyBatchProgress)}`);
-  addLink(body, styles, 'Frozen Inventory', `${docsRoot}${getDrive(DriveName.FrozenInventory)}`);
-  addLink(body, styles, 'Raw Inventory', `${docsRoot}${getDrive(DriveName.RawInventory)}`);
-  addLink(body, styles, 'Batch Production History', `${docsRoot}${getDrive(DriveName.BatchHistoryDoc)}`);
+  addHeader(body, 'Inventory and Batch Summaries', true);
+  addLink(body, 'Daily Batch Progress', `${docsRoot}${getDrive(DriveName.DailyBatchProgress)}`, true);
+  addLink(body, 'Frozen Inventory', `${docsRoot}${getDrive(DriveName.FrozenInventory)}`, true);
+  addLink(body, 'Raw Inventory', `${docsRoot}${getDrive(DriveName.RawInventory)}`, true);
+  addLink(body, 'Batch Production History', `${docsRoot}${getDrive(DriveName.BatchHistoryDoc)}`, true);
+  addLink(body, 'Batch Production History Detail', `${docsRoot}${getDrive(DriveName.BatchHistoryDetailDoc)}`, true);
 
   const batchBody = DocumentApp.openById(getDrive(DriveName.DailyBatchProgress)).getBody();
-  buildTitle(batchBody, styles);
+  buildTitle(batchBody);
 
   // Build the daily batch doc
-  addHeader(batchBody, styles, 'Daily Batch Progress');
+  addHeader(batchBody, 'Daily Batch Progress', true);
 
   var progress = new CBatches().list;
   var tableData = [];
@@ -121,7 +205,7 @@ function buildInstructionsDoc() {
 
   // Build the daily batch doc
   const frozenBody = DocumentApp.openById(getDrive(DriveName.FrozenInventory)).getBody();
-  buildTitle(frozenBody, styles);
+  buildTitle(frozenBody);
   const frozen = new CFrozen().list.sort((a,b) => (a.name > b.name) ? 1 : (b.name > a.name) ? -1 : 0);
   locations.forEach(l => {
     var location = {'location': l, 'data': []};
@@ -147,7 +231,7 @@ function buildInstructionsDoc() {
 
   // Build the raw inventory page
   const rawBody = DocumentApp.openById(getDrive(DriveName.RawInventory)).getBody();
-  buildTitle(rawBody, styles);
+  buildTitle(rawBody);
   locations.forEach(l => {
     var location = {'location': l, 'data': []};
     location.data.push(['Ingredient', 'Amount']);
@@ -168,48 +252,49 @@ function buildInstructionsDoc() {
 
   // Build the batch history page
   const historyBody = DocumentApp.openById(getDrive(DriveName.BatchHistoryDoc)).getBody();
-  buildTitle(historyBody, styles);
+  buildTitle(historyBody);
+  addLink(historyBody, 'Batch Production History Detail', `${docsRoot}${getDrive(DriveName.BatchHistoryDetailDoc)}`, false);
+
   const histories = new CHistory().list;
-  var date = new Date();
   const today = new Date();
   const year = today.getFullYear();
-  const month = today.getMonth();
+  var month = today.getMonth();
+  if (month < 4) {
+    month = 1;
+  } else if (month < 7) {
+    month = 4;
+  } else if (month < 10) {
+    month = 7;
+  } else {
+    month = 10;
+  }
   locations.forEach(l => {
-    // CURRENT MONTH DATA
-    const location = {'location': l, 'data': []};
-    location.data.push(['Date', 'Flavor', 'Batches', 'Total Yield']);
-    var currentMonth = histories.filter(h => 
-      new Date(h.date).getMonth() == month 
-      && new Date(h.date).getFullYear() == year 
-      && h.location === l
-    );
-    currentMonth.forEach(h => {
-      location.data.push([h.date, h.flavor, h.completed, h.total]);
-    });
-    par = historyBody.appendParagraph(`${l} Current Month Batches`);
-    par.setAttributes(styles.headerStyle);
-    par.setLineSpacing(1.5); 
-
-    const table = historyBody.appendTable(location.data);
-    table.setAttributes(styles.tableStyle);
-    table.setColumnWidth(1, 300);
-
-    // PREVIOUS YEAR DATA
+    addHeader(historyBody, `Production  for ${l}`, true);
+ 
+    const currentQuarter  = `${month}/1/${year}`;
     const firstQuarter = `1/1/${month > 3 ? year : year - 1 }`;
     const secondQuarter = `4/1/${month > 6 ? year : year - 1 }`;
     const thirdQuarter = `7/1/${month > 9 ? year : year - 1 }`;
     const fourthQuarter = `10/1/${month >= 12 ? year : year - 1 }`;
-    const newYear = `12/31/${year}`;
 
-    addHistory(historyBody, styles, flavors, histories, l, firstQuarter, '1st');
-    addHistory(historyBody, styles, flavors, histories, l, secondQuarter, '2nd');
-    addHistory(historyBody, styles, flavors, histories, l, thirdQuarter, '3rd');
-    addHistory(historyBody, styles, flavors, histories, l, fourthQuarter, '4th');
+    addHistory(historyBody, flavors, histories, l, currentQuarter, 'Current', year, l == 'Fresno' ? DriveName.BatchHistoryDetail0Doc : null);
+    addHistory(historyBody, flavors, histories, l, firstQuarter, '1st', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail1Doc : null);
+    addHistory(historyBody, flavors, histories, l, secondQuarter, '2nd', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail2Doc : null);
+    addHistory(historyBody, flavors, histories, l, thirdQuarter, '3rd', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail3Doc : null);
+    addHistory(historyBody, flavors, histories, l, fourthQuarter, '4th', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail4Doc : null);
+    // if (l == 'Fresno') {
+    //   addHistoryDetail(getDrive(DriveName.BatchHistoryDetail0Doc), histories, l, currentQuarter, 'Current');      
+    //   addHistoryDetail(getDrive(DriveName.BatchHistoryDetail1Doc), histories, l, firstQuarter, '1st');      
+    //   addHistoryDetail(getDrive(DriveName.BatchHistoryDetail2Doc), histories, l, secondQuarter, '2nd');      
+    //   addHistoryDetail(getDrive(DriveName.BatchHistoryDetail3Doc), histories, l, thirdQuarter, '3rd');      
+    //   addHistoryDetail(getDrive(DriveName.BatchHistoryDetail4Doc), histories, l, fourthQuarter, '4th');      
+    // }
     
     historyBody.appendPageBreak();
+
   });
 
-  addHeader(body, styles, 'Inventory Input Forms');
+  addHeader(body, 'Inventory Input Forms', true);
   par = body.appendParagraph('Frozen Cookie Count Inventory Form');
   styles.linkStyle[DocumentApp.Attribute.LINK_URL] = `${formsRoot}${getDrive(DriveName.CookieCounterClient)}/viewform`;
   par.setAttributes(styles.linkStyle)
@@ -225,7 +310,7 @@ function buildInstructionsDoc() {
   par.setAttributes(styles.linkStyle)
   par.setLineSpacing(2);
 
-  addHeader(body, styles, 'Management');
+  addHeader(body, 'Management', true);
 
   par = body.appendParagraph('Shipment Received');
   styles.linkStyle[DocumentApp.Attribute.LINK_URL] = getDrive(DriveName.ShippingReceivedWb);
