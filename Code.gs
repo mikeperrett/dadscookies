@@ -5,7 +5,7 @@ const Keys = {
 }
 
 const released = PropertiesService.getScriptProperties().getProperty(Keys.Version);
-const current = 46;
+const current = 47;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -90,10 +90,10 @@ function getDocFileName(name) {
     switch(name) {
       case DriveName.BatchHistoryDetailDoc: return 'BatchHistoryDetail';
       case DriveName.BatchHistoryDoc: return 'BatchHistory'
-      case DriveName.DailyBatchProgress: return 'DailyBatchProgressDev'
-      case DriveName.FrozenInventory: return 'FrozenInventoryDev'
-      case DriveName.Instructions: return 'InstructionsDev'
-      case DriveName.RawInventory: return 'RawInventoryDev'
+      case DriveName.DailyBatchProgress: return 'DailyBatchProgress'
+      case DriveName.FrozenInventory: return 'FrozenInventory'
+      case DriveName.Instructions: return 'Instructions'
+      case DriveName.RawInventory: return 'RawInventory'
     }
   }
 }
