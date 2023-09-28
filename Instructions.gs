@@ -162,7 +162,7 @@ function buildInstructionsDoc() {
   const flavors = new CFlavors().list.sort((a,b) => (a.name > b.name) ? 1 : (b.name > a.name) ? -1 : 0);
   const stock = new CStock().list.sort((a,b) => (a.name > b.name) ? 1 : (b.anme > a.name) ? -1 : 0);
   const locations = getLocations();
-  var body = DocumentApp.openById(getDrive(DriveName.Instructions)).getBody();
+  const body = getDocument(getDrive(DriveName.FormsFolder), getDocFileName(DriveName.Instructions)).getBody();
   buildTitle(body, styles);
 
   addHeader(body, 'Batch Mix Instructions', true);
@@ -182,7 +182,7 @@ function buildInstructionsDoc() {
   addLink(body, 'Batch Production History', `${docsRoot}${getDrive(DriveName.BatchHistoryDoc)}`, true);
   addLink(body, 'Batch Production History Detail', `${docsRoot}${getDrive(DriveName.BatchHistoryDetailDoc)}`, true);
 
-  const batchBody = DocumentApp.openById(getDrive(DriveName.DailyBatchProgress)).getBody();
+  const batchBody = getDocument(getDrive(DriveName.FormsFolder), getDocFileName(DriveName.DailyBatchProgress)).getBody();
   buildTitle(batchBody);
 
   // Build the daily batch doc
@@ -204,7 +204,7 @@ function buildInstructionsDoc() {
   table.setColumnWidth(0, 300);
 
   // Build the daily batch doc
-  const frozenBody = DocumentApp.openById(getDrive(DriveName.FrozenInventory)).getBody();
+  const frozenBody = getDocument(getDrive(DriveName.FormsFolder), getDocFileName(DriveName.FrozenInventory)).getBody();
   buildTitle(frozenBody);
   const frozen = new CFrozen().list.sort((a,b) => (a.name > b.name) ? 1 : (b.name > a.name) ? -1 : 0);
   locations.forEach(l => {
@@ -230,7 +230,7 @@ function buildInstructionsDoc() {
   });
 
   // Build the raw inventory page
-  const rawBody = DocumentApp.openById(getDrive(DriveName.RawInventory)).getBody();
+  const rawBody = getDocument(getDrive(DriveName.FormsFolder), getDocFileName(DriveName.RawInventory)).getBody();
   buildTitle(rawBody);
   locations.forEach(l => {
     var location = {'location': l, 'data': []};
@@ -251,7 +251,7 @@ function buildInstructionsDoc() {
   });
 
   // Build the batch history page
-  const historyBody = DocumentApp.openById(getDrive(DriveName.BatchHistoryDoc)).getBody();
+  const historyBody = getDocument(getDrive(DriveName.FormsFolder), getDocFileName(DriveName.BatchHistoryDoc)).getBody();
   buildTitle(historyBody);
   addLink(historyBody, 'Batch Production History Detail', `${docsRoot}${getDrive(DriveName.BatchHistoryDetailDoc)}`, false);
 
@@ -277,19 +277,11 @@ function buildInstructionsDoc() {
     const thirdQuarter = `7/1/${month > 9 ? year : year - 1 }`;
     const fourthQuarter = `10/1/${month >= 12 ? year : year - 1 }`;
 
-    addHistory(historyBody, flavors, histories, l, currentQuarter, 'Current', year, l == 'Fresno' ? DriveName.BatchHistoryDetail0Doc : null);
-    addHistory(historyBody, flavors, histories, l, firstQuarter, '1st', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail1Doc : null);
-    addHistory(historyBody, flavors, histories, l, secondQuarter, '2nd', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail2Doc : null);
-    addHistory(historyBody, flavors, histories, l, thirdQuarter, '3rd', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail3Doc : null);
-    addHistory(historyBody, flavors, histories, l, fourthQuarter, '4th', month > 3 ? year : year - 1, l == 'Fresno' ? DriveName.BatchHistoryDetail4Doc : null);
-    // if (l == 'Fresno') {
-    //   addHistoryDetail(getDrive(DriveName.BatchHistoryDetail0Doc), histories, l, currentQuarter, 'Current');      
-    //   addHistoryDetail(getDrive(DriveName.BatchHistoryDetail1Doc), histories, l, firstQuarter, '1st');      
-    //   addHistoryDetail(getDrive(DriveName.BatchHistoryDetail2Doc), histories, l, secondQuarter, '2nd');      
-    //   addHistoryDetail(getDrive(DriveName.BatchHistoryDetail3Doc), histories, l, thirdQuarter, '3rd');      
-    //   addHistoryDetail(getDrive(DriveName.BatchHistoryDetail4Doc), histories, l, fourthQuarter, '4th');      
-    // }
-    
+    addHistory(historyBody, flavors, histories, l, currentQuarter, 'Current', year);
+    addHistory(historyBody, flavors, histories, l, firstQuarter, '1st', month > 3 ? year : year - 1);
+    addHistory(historyBody, flavors, histories, l, secondQuarter, '2nd', month > 3 ? year : year - 1);
+    addHistory(historyBody, flavors, histories, l, thirdQuarter, '3rd', month > 3 ? year : year - 1);
+    addHistory(historyBody, flavors, histories, l, fourthQuarter, '4th', month > 3 ? year : year - 1);
     historyBody.appendPageBreak();
 
   });

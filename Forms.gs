@@ -84,6 +84,8 @@ function updateAllForms() {
   updateLocationsAndEmployees(getDrive(DriveName.CookieCounter), users, locations, true);
   updateLocationsAndEmployees(getDrive(DriveName.SpecialCookieOne), users, locations, false);
   updateLocationsAndEmployees(getDrive(DriveName.SpecialCookieTwo), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.ValleyPistachio), users, locations, false);
+  updateLocationsAndEmployees(getDrive(DriveName.RedVelvet), users, locations, false);
   updateLocationsAndEmployees(getDrive(DriveName.ShipmentReceivedMobile), users, locations, true);
   updateLocationsAndEmployees(getDrive(DriveName.ManualInventoryForm), users, locations, true);
   
