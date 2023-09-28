@@ -5,7 +5,7 @@ const Keys = {
 }
 
 const released = PropertiesService.getScriptProperties().getProperty(Keys.Version);
-const current = 44;
+const current = 46;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -44,6 +44,8 @@ const Sheet = {
 }
 
 const DriveName = {
+  FormsFolder: 'FormsFolder',
+  RootFolder: 'RootFolder',
   ClassicChocolateChip: 'ChocolateChip',
   CookiesNCream: 'CookiesNCream',
   CakeBatter: 'BirthdayCakeBatter',
@@ -54,6 +56,8 @@ const DriveName = {
   OatmealRaisin: 'OatmealRaisin',
   SpecialCookieOne: 'SpecialCookieOne',
   SpecialCookieTwo: 'SpecialCookieTwo',
+  ValleyPistachio: 'ValleyPistachio',
+  RedVelvet: 'RedVelvet',
   Instructions: 'Instructions',
   Stock: 'Stock',
   CookieCounter: 'CookieCounter',
@@ -70,16 +74,36 @@ const DriveName = {
   ManualInventoryFormClient: 'ManualInventoryFormClient',
   BatchHistoryDoc: 'BatchHistoryDoc',
   BatchHistoryDetailDoc: 'BatchHistoryDetailDoc',
-  BatchHistoryDetail1Doc: 'BatchHistoryDetail-1-Doc',
-  BatchHistoryDetail2Doc: 'BatchHistoryDetail-2-Doc',
-  BatchHistoryDetail3Doc: 'BatchHistoryDetail-3-Doc',
-  BatchHistoryDetail4Doc: 'BatchHistoryDetail-4-Doc',
+}
+
+function getDocFileName(name) {
+  if (beta) {
+    switch(name) {
+      case DriveName.BatchHistoryDetailDoc: return 'BatchHistoryDetailDev';
+      case DriveName.BatchHistoryDoc: return 'BatchHistoryDev'
+      case DriveName.DailyBatchProgress: return 'DailyBatchProgressDev'
+      case DriveName.FrozenInventory: return 'FrozenInventoryDev'
+      case DriveName.Instructions: return 'InstructionsDev'
+      case DriveName.RawInventory: return 'RawInventoryDev'
+    }
+  } else {
+    switch(name) {
+      case DriveName.BatchHistoryDetailDoc: return 'BatchHistoryDetail';
+      case DriveName.BatchHistoryDoc: return 'BatchHistory'
+      case DriveName.DailyBatchProgress: return 'DailyBatchProgressDev'
+      case DriveName.FrozenInventory: return 'FrozenInventoryDev'
+      case DriveName.Instructions: return 'InstructionsDev'
+      case DriveName.RawInventory: return 'RawInventoryDev'
+    }
+  }
 }
 
 function getDrive(name) {
   if (beta) {
     // Dev documents
     switch (name) {
+      case DriveName.FormsFolder: return '10vR3nkzD3kWeE5OTZEdsVpPYywWfpflE';
+      case DriveName.RootFolder: return '1gKDrdcUBTinqMUfZFhJ5RiSxCq0Bp8lz';
       case DriveName.ClassicChocolateChip: return '1Jy7C8YHgSmgqr2nDYRMmSWMs56LCusxj7zjQ7t9_6V0';
       case DriveName.CookiesNCream: return '1v4EYH9AbYhfIdgN9XHQ9sWoFIulLGFFo9msM9Fp43WU';
       case DriveName.CakeBatter: return '1Lky99RutyC3GLI80kfDUBm9774Fk6FsYNw3Xf49wPi4';
@@ -90,6 +114,8 @@ function getDrive(name) {
       case DriveName.OatmealRaisin: return '1QYBymJO5PIHf1wRHcv57NqUWotM_i2QpCaQAVSBxZQI';
       case DriveName.SpecialCookieOne: return '13EY_FRoaChO6oi6TcLNrXLsjS9u47QWAB_TjvT-TtBU';
       case DriveName.SpecialCookieTwo: return '1oxC2x0_ZiqCgaVYzGbtQ-KcQ8KAOzWaM0O8fCxD5K8o';
+      case DriveName.ValleyPistachio: return '15fLyM1RD61I_VRtoU_GI3Kjg79zkkxeB35p44pY0yfc';
+      case DriveName.RedVelvet: return '1UNMOqTNcxk6zmV_jZrCpErxyiuqdrVmxdtR1Y1gAOQk';
       case DriveName.CookieCounter: return '1LGhaUbGJgqPzrM3IoV9AZXl54YAwYKTtekR1-fuVrrQ';
       case DriveName.CookieCounterClient: return '1FAIpQLScvlogtKjI4m-lDgXn3esJE1uRxIbyuyH8AzBtnQ2pOXq6ivA';
       case DriveName.ShipmentRecievedDesktop: return '1GcBDH5xfgMC3ivkHEA4C-FacedbWwX-V1YKhSTIgdQw';
@@ -110,6 +136,8 @@ function getDrive(name) {
   } else {
     // Production documents
     switch (name) {
+      case DriveName.FormsFolder: return '1HqoOxSErIEJeWXvMuRfEFHfYWbKReY_N';
+      case DriveName.RootFolder: return '1Z4z9heozzeY8l2w12rq65IGvRg4eV_kV';
       case DriveName.ClassicChocolateChip: return '1L8OT7CsMQNwNc-8ZU2VohK0P7o02xleb7sfJ70qRfv8';
       case DriveName.CookiesNCream: return '1y1joj74-G4VN5b24yIONNi_U2Bt2g1RKT5vWx_aDcgI';
       case DriveName.CakeBatter: return '1dZt56rIYQi1JsYpeKq7mKMJ0N871-DRBcSSI2HNnaGo';
@@ -120,6 +148,8 @@ function getDrive(name) {
       case DriveName.OatmealRaisin: return '1qiss8IZCtYBA-FWUcYFYgYgUK3c-pfsdt81QLUsjg2U';
       case DriveName.SpecialCookieOne: return '1iUJezM6gziCGkDSzcO4HPsWvMVbcyy9nQBH7TFcM2IA';
       case DriveName.SpecialCookieTwo: return '1WK8NEaiLbEOTDDUwPWKrjxhIY6ocUjKXSuqgjqAl38A';
+      case DriveName.ValleyPistachio: return '1tuzRjQ0452BYhSpu2aoBiGlgyRzNXCVpwLaHp-w7Jgw';
+      case DriveName.RedVelvet: return '1BYBQU4HTnTy6unMT_BWFEI2ZR9dgbh_Hu0xmY6G2KHc';
       case DriveName.CookieCounter: return '1ImDLQuuR5BdacaLSedMpF4uLvrOMwpq7he1mXVnb7c8';
       case DriveName.CookieCounterClient: return '1FAIpQLSfNDIkgsvOYEFEn6Jffsi-HuQXNXSbsT7bLOeVek_SXWlV7gA';
       case DriveName.ShipmentRecievedDesktop: return '1-x1QNOMd9YnawMjbUbT7sAsTCyV0DQ0rkDhu5J19rAY';
@@ -140,6 +170,27 @@ function getDrive(name) {
   }
 }
 
+function testCreateDocument() {
+  const doc = getDocument(getDrive(DriveName.FormsFolder), 'Test Document');
+  buildTitle(doc.getBody());
+}
+
+function getDocument(folderId, title) {
+  const forms = DriveApp.getFolderById(folderId);
+  const files = forms.searchFiles(`title = "${title}"`);
+  var file = {};
+  var doc = {};
+  if(files.hasNext()) {
+    const file = files.next();
+    doc = DocumentApp.openById(file.getId());
+  } else {
+    doc = DocumentApp.create(title);
+    const file = DriveApp.getFileById(doc.getId());
+    file.moveTo(forms);
+  }
+  return doc;
+}
+
 function doGet() {
   // var batches = getBatches();
   // var content = ''
@@ -153,9 +204,11 @@ function doGet() {
 }
 
 function getDynamicMenu(menu, documentId) {
-  const email = Session.getActiveUser();
-  Logger.log(email);
-  return new DynamicMenu(menu, documentId, email);
+  const email = Session.getActiveUser().getEmail();
+  const name = email.substring(0, email.indexOf('@'));
+  // const docName = DocumentApp.openById(documentId).getName();
+  // const docId = getDocument(getDrive(DriveName.FormsFolder), `${docName}-${name}`).getId();
+  return new DynamicMenu(menu, documentId, name);
 }
 
 function testGetLocations() {
