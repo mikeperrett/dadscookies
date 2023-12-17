@@ -170,8 +170,8 @@ function getDrive(name) {
       case DriveName.ManualInventoryFormClient: return '1FAIpQLSdzVFEH7dscHA-7AFrKcqBHGUyUgXU98_vvHHQTNwe2DJSOAA';
       case DriveName.BatchHistoryDoc: return '1jYKF6rFgmsy2I_8keJ2H3ECR1b6u5Kb_Z7o2BYNDONM';
       case DriveName.BatchHistoryDetailDoc: return '163Uf_HCztsnBDMZnzZBg1QAz9UXWvp2lL0vWmbrEBzc';
-      case DriveName.FrozenShipmentReceivedForm: return '';
-      case DriveName.FrozenShipmentReceivedFormClient: return '';
+      case DriveName.FrozenShipmentReceivedForm: return '1jVhyToomIFC9iHhv5hgW6ThJh8E6laZah2vFq9t9fGY';
+      case DriveName.FrozenShipmentReceivedFormClient: return '1FAIpQLSdj5KSQ4OECXCa3l4A2o8t_ZB1FSJSqJVHmtAgum_ZuPon1hQ';
     }
   }
 }
