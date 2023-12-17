@@ -5,7 +5,7 @@ const Keys = {
 }
 
 const released = PropertiesService.getScriptProperties().getProperty(Keys.Version);
-const current = 48;
+const current = 51;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
