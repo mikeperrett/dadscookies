@@ -5,7 +5,7 @@ const Keys = {
 }
 
 const released = PropertiesService.getScriptProperties().getProperty(Keys.Version);
-const current = 47;
+const current = 48;
 const beta = current > released;
 const STOCK_WB = 'https://docs.google.com/spreadsheets/d/1-_Qob4UiwEByJKeyodi6zDfrJnojNUUYB9NPK-cNZqU/edit';
 const STOCK_WB_DEV = 'https://docs.google.com/spreadsheets/d/18QUKlSsKupDOwgjvQ-BwHDUzX-ufEYpvnW2rZU5TEB4/edit';
@@ -74,6 +74,8 @@ const DriveName = {
   ManualInventoryFormClient: 'ManualInventoryFormClient',
   BatchHistoryDoc: 'BatchHistoryDoc',
   BatchHistoryDetailDoc: 'BatchHistoryDetailDoc',
+  FrozenShipmentReceivedForm: 'FrozenShipmentReceived',
+  FrozenShipmentReceivedFormClient: 'FrozenShipmentReceivedClient',
 }
 
 function getDocFileName(name) {
@@ -132,6 +134,8 @@ function getDrive(name) {
       case DriveName.ManualInventoryFormClient: return '1FAIpQLSc8xGAKIJjR-eGqzKBxAYrnxlCpvGJDvdclZhdXgQ9hNVul0Q';
       case DriveName.BatchHistoryDoc: return '16lVJkWhvKb8Byb6c-hLxYuP7mNvF9sg0NGi1s1Fmfj0';
       case DriveName.BatchHistoryDetailDoc: return '1enpaNyTM2fsTmNIH7P12-CeI0EWEloNmVDkVM_PXOWI';
+      case DriveName.FrozenShipmentReceivedForm: return '1F2HYPrm8hwIH6ZsBppx131meCz-kz2cRdJQpF132Y1E';
+      case DriveName.FrozenShipmentReceivedFormClient: return '1FAIpQLSduVh4i39IORM1jhCK11pojiFhiirUgfMYrgCzYI2PunkSRYA';
     }
   } else {
     // Production documents
@@ -166,6 +170,8 @@ function getDrive(name) {
       case DriveName.ManualInventoryFormClient: return '1FAIpQLSdzVFEH7dscHA-7AFrKcqBHGUyUgXU98_vvHHQTNwe2DJSOAA';
       case DriveName.BatchHistoryDoc: return '1jYKF6rFgmsy2I_8keJ2H3ECR1b6u5Kb_Z7o2BYNDONM';
       case DriveName.BatchHistoryDetailDoc: return '163Uf_HCztsnBDMZnzZBg1QAz9UXWvp2lL0vWmbrEBzc';
+      case DriveName.FrozenShipmentReceivedForm: return '';
+      case DriveName.FrozenShipmentReceivedFormClient: return '';
     }
   }
 }

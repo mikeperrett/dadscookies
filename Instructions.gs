@@ -292,8 +292,8 @@ function buildInstructionsDoc() {
   par.setAttributes(styles.linkStyle)
   par.setLineSpacing(2);
 
-  par = body.appendParagraph('Shipment Received Form');
-  styles.linkStyle[DocumentApp.Attribute.LINK_URL] = `${formsRoot}${getDrive(DriveName.ShipmentReceivedMobileClient)}/viewform`;
+  par = body.appendParagraph('Frozen Shipment Received Form');
+  styles.linkStyle[DocumentApp.Attribute.LINK_URL] = `${formsRoot}${getDrive(DriveName.FrozenShipmentReceivedFormClient)}/viewform`;
   par.setAttributes(styles.linkStyle)
   par.setLineSpacing(2);
 

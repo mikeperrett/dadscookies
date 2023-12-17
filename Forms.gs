@@ -88,6 +88,7 @@ function updateAllForms() {
   updateLocationsAndEmployees(getDrive(DriveName.RedVelvet), users, locations, false);
   updateLocationsAndEmployees(getDrive(DriveName.ShipmentReceivedMobile), users, locations, true);
   updateLocationsAndEmployees(getDrive(DriveName.ManualInventoryForm), users, locations, true);
+  updateLocationsAndEmployees(getDrive(DriveName.FrozenShipmentReceivedForm), users, locations, false);
   
   var recipes = new CBatchRecipes().list;
   var specials = getSpecials();
@@ -97,6 +98,7 @@ function updateAllForms() {
 
   // Update the special cookies that are enabled
   buildSpecialsForms(specials, recipes);
+  updateFrozenShipmentReceivedForm();
 }
 
 
@@ -303,3 +305,19 @@ function formSubmitted(e) {
     }
   }
 }
+
+function updateFrozenShipmentReceivedForm() {
+  var flavors = new CFlavors().list;
+  var form = FormApp.openById(getDrive(DriveName.FrozenShipmentReceivedForm));
+  var questions = form.getItems();
+  questions.forEach(q => {
+    if (q.getIndex() > 1) {
+      form.deleteItem(q);
+    }
+  });
+  flavors.forEach(flavor => {
+    var item = form.addTextItem();
+    item.setTitle(flavor.name);
+  });
+}
+
